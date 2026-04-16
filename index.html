@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Greenshine Academy — Canteen Finance System</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <style>
+    /* ── Index-specific styles ── */
+    body { overflow: hidden; }
+
+    .landing {
+      position       : relative;
+      z-index        : 1;
+      min-height     : 100vh;
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+    }
+
+    .landing-card {
+      background     : rgba(13,13,13,0.82);
+      border         : 1px solid rgba(255,255,255,0.08);
+      border-radius  : 20px;
+      padding        : 48px 44px;
+      width          : 100%;
+      max-width      : 420px;
+      backdrop-filter: blur(20px);
+      box-shadow     : 0 24px 64px rgba(0,0,0,0.6);
+      animation      : fadeUp 0.6s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .landing-logo {
+      text-align   : center;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width          : 64px;
+      height         : 64px;
+      background     : linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius  : 16px;
+      display        : inline-flex;
+      align-items    : center;
+      justify-content: center;
+      font-size      : 28px;
+      margin-bottom  : 16px;
+      box-shadow     : 0 8px 24px rgba(139,58,42,0.3);
+    }
+
+    .landing-logo h1 {
+      font-size  : 22px;
+      font-weight: 700;
+      color      : var(--light);
+      line-height: 1.2;
+    }
+
+    .landing-logo p {
+      font-size : 13px;
+      color     : var(--muted);
+      margin-top: 4px;
+    }
+
+    .color-bar {
+      height       : 3px;
+      border-radius: 2px;
+      background   : linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+      margin       : 20px 0 28px;
+    }
+
+    .enter-btn {
+      width          : 100%;
+      padding        : 14px;
+      background     : linear-gradient(135deg, var(--secondary), var(--accent));
+      border         : none;
+      border-radius  : var(--radius);
+      color          : white;
+      font-size      : 15px;
+      font-weight    : 600;
+      letter-spacing : 0.5px;
+      transition     : var(--transition);
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      gap            : 10px;
+      box-shadow     : 0 4px 16px rgba(192,57,43,0.3);
+    }
+
+    .enter-btn:hover {
+      transform : translateY(-2px);
+      box-shadow: 0 8px 24px rgba(192,57,43,0.4);
+    }
+
+    .enter-btn:active { transform: translateY(0); }
+
+    .enter-btn .arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .enter-btn:hover .arrow { transform: translateX(4px); }
+
+    .system-stats {
+      display              : grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap                  : 12px;
+      margin-bottom        : 28px;
+    }
+
+    .sys-stat {
+      background   : rgba(255,255,255,0.03);
+      border       : 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding      : 12px;
+      text-align   : center;
+    }
+
+    .sys-stat-value {
+      font-size  : 20px;
+      font-weight: 700;
+      color      : var(--light);
+      line-height: 1;
+    }
+
+    .sys-stat-label {
+      font-size : 11px;
+      color     : var(--muted);
+      margin-top: 4px;
+    }
+
+    .landing-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size : 12px;
+      color     : var(--muted-2);
+    }
+
+    .status-dot {
+      display      : inline-block;
+      width        : 7px;
+      height       : 7px;
+      border-radius: 50%;
+      background   : var(--success);
+      margin-right : 5px;
+      animation    : pulse-dot 2s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1;   transform: scale(1);   }
+      50%      { opacity: 0.6; transform: scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Particle Network Background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Landing Card -->
+  <div class="landing">
+    <div class="landing-card">
+
+      <div class="landing-logo">
+        <div class="logo-icon">🍽️</div>
+        <h1>Greenshine Academy</h1>
+        <p>Canteen Finance Management System</p>
+      </div>
+
+      <div class="color-bar"></div>
+
+      <!-- System Stats -->
+      <div class="system-stats">
+        <div class="sys-stat">
+          <div class="sys-stat-value">7</div>
+          <div class="sys-stat-label">Screens</div>
+        </div>
+        <div class="sys-stat">
+          <div class="sys-stat-value">4</div>
+          <div class="sys-stat-label">Pay Types</div>
+        </div>
+        <div class="sys-stat">
+          <div class="sys-stat-value" id="student-count">—</div>
+          <div class="sys-stat-label">Students</div>
+        </div>
+      </div>
+
+      <!-- Enter Button -->
+      <button class="enter-btn" onclick="enterSystem()">
+        <span>Enter System</span>
+        <span class="arrow">→</span>
+      </button>
+
+      <div class="landing-footer">
+        <span class="status-dot"></span>
+        System online · Connected to Google Sheets
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/sheets.js"></script>
+
+  <script>
+    // ── Start particle animation ──
+    initParticleNetwork("particle-canvas");
+
+    // ── Load student count from API ──
+    async function loadStudentCount() {
+      try {
+        const res   = await Sheets.getStudents();
+        const count = res.students ? res.students.length : "—";
+        document.getElementById("student-count").textContent = count;
+      } catch (err) {
+        document.getElementById("student-count").textContent = "—";
+      }
+    }
+
+    loadStudentCount();
+
+    // ── Enter system → go to dashboard ──
+    function enterSystem() {
+      window.location.href = "pages/dashboard.html";
+    }
+
+    // ── Allow Enter key ──
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") enterSystem();
+    });
+  </script>
+
+</body>
+</html>

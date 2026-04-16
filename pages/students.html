@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students — Greenshine Canteen</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <style>
+    .student-row { cursor: pointer; }
+    .student-row.selected { background: rgba(139,58,42,0.1) !important; }
+
+    .detail-panel {
+      width          : 320px;
+      min-width      : 320px;
+      background     : rgba(13,13,13,0.95);
+      border-left    : 1px solid var(--border);
+      display        : flex;
+      flex-direction : column;
+      position       : fixed;
+      right          : 0;
+      top            : 0;
+      bottom         : 0;
+      z-index        : 150;
+      transform      : translateX(100%);
+      transition     : transform 0.3s ease;
+      overflow-y     : auto;
+    }
+
+    .detail-panel.open { transform: translateX(0); }
+
+    .detail-header {
+      padding        : 20px;
+      border-bottom  : 1px solid var(--border);
+      display        : flex;
+      align-items    : center;
+      justify-content: space-between;
+      position       : sticky;
+      top            : 0;
+      background     : rgba(13,13,13,0.98);
+      z-index        : 1;
+    }
+
+    .detail-avatar {
+      width          : 52px;
+      height         : 52px;
+      border-radius  : 50%;
+      background     : linear-gradient(135deg, var(--secondary), var(--accent));
+      display        : flex;
+      align-items    : center;
+      justify-content: center;
+      font-size      : 20px;
+      font-weight    : 700;
+      color          : white;
+      flex-shrink    : 0;
+      margin-bottom  : 12px;
+    }
+
+    .detail-body { padding: 20px; }
+
+    .detail-field {
+      margin-bottom: 14px;
+    }
+
+    .detail-field-label {
+      font-size    : 11px;
+      font-weight  : 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color        : var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .detail-field-value {
+      font-size  : 14px;
+      color      : var(--light);
+      font-weight: 400;
+    }
+
+    .balance-big {
+      font-size  : 32px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin     : 16px 0;
+    }
+
+    .tx-item {
+      padding      : 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size    : 13px;
+    }
+
+    .tx-item:last-child { border-bottom: none; }
+
+    .tx-item-top {
+      display        : flex;
+      justify-content: space-between;
+      align-items    : center;
+      margin-bottom  : 4px;
+    }
+
+    .tx-type-meal    { color: var(--warning); }
+    .tx-type-payment { color: var(--success); }
+
+    .filters {
+      display  : flex;
+      gap      : 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .filters .form-control {
+      width    : auto;
+      min-width: 140px;
+    }
+
+    .search-wrap {
+      flex      : 1;
+      min-width : 200px;
+      max-width : 340px;
+      position  : relative;
+    }
+
+    .search-icon {
+      position : absolute;
+      left     : 12px;
+      top      : 50%;
+      transform: translateY(-50%);
+      color    : var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .search-input { padding-left: 36px !important; }
+  </style>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="avatar">G</div>
+        <div class="sidebar-logo-text">
+          <h1>Greenshine Academy</h1>
+          <span>Canteen Finance System</span>
+        </div>
+      </div>
+      <div class="sidebar-section-label">Main</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="dashboard.html">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+        <a class="nav-item active" href="students.html">
+          <span class="nav-icon">👤</span> Students
+        </a>
+        <a class="nav-item" href="record.html">
+          <span class="nav-icon">✏️</span> Record Transaction
+        </a>
+      </nav>
+      <div class="sidebar-section-label">Alerts</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="watchlist.html">
+          <span class="nav-icon">⚠️</span> Watchlist
+          <span class="nav-badge" id="watchlist-count">—</span>
+        </a>
+      </nav>
+      <div class="sidebar-section-label">Reports</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="reports.html">
+          <span class="nav-icon">📋</span> Reports
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">A</div>
+        <div>
+          <div style="font-size:13px;color:var(--light)">Admin</div>
+          <div style="font-size:11px;color:var(--muted)">Administrator</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Students</div>
+          <div class="topbar-date" id="student-count-label">Loading...</div>
+        </div>
+        <div class="topbar-actions">
+          <a href="record.html" class="btn btn-primary btn-sm">✏️ Record Transaction</a>
+        </div>
+      </div>
+
+      <div class="page-body">
+
+        <!-- Filters -->
+        <div class="filters">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input
+              type        = "text"
+              id          = "search-input"
+              class       = "form-control search-input"
+              placeholder = "Search by name or ADM No..."
+              oninput     = "filterStudents()"
+            />
+          </div>
+          <select class="form-control" id="filter-grade" onchange="filterStudents()">
+            <option value="">All Classes</option>
+            <option value="PP1">PP1</option>
+            <option value="PP2">PP2</option>
+            <option value="PG">PG</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 4</option>
+            <option value="5">Grade 5</option>
+            <option value="6">Grade 6</option>
+          </select>
+          <select class="form-control" id="filter-type" onchange="filterStudents()">
+            <option value="">All Types</option>
+            <option value="0">0 · Unranked</option>
+            <option value="A">A · Prepaid</option>
+            <option value="B">B · Weekly Tab</option>
+            <option value="C">C · Occasional</option>
+            <option value="D">D · Non-paying</option>
+          </select>
+          <select class="form-control" id="filter-balance" onchange="filterStudents()">
+            <option value="">All Balances</option>
+            <option value="positive">Positive</option>
+            <option value="negative">Negative</option>
+            <option value="zero">Zero</option>
+          </select>
+        </div>
+
+        <!-- Students Table -->
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>ADM</th>
+                  <th>Class</th>
+                  <th>Type</th>
+                  <th>Subscriptions</th>
+                  <th class="text-right">Daily</th>
+                  <th class="text-right">Balance</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-table">
+                <tr>
+                  <td colspan="8">
+                    <div class="loading">
+                      <div class="spinner"></div> Loading students...
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Detail Panel -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <span style="font-size:14px;font-weight:600">Student Detail</span>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/animation.js"></script>
+  <script src="../js/sheets.js"></script>
+  <script src="../js/students.js"></script>
+
+  <script>
+    let allStudents = [];
+    let filteredStudents = [];
+
+    initParticleNetwork("particle-canvas");
+    loadStudents();
+
+    async function loadStudents() {
+      try {
+        allStudents = await Sheets.getStudentsWithBalances();
+        filteredStudents = [...allStudents];
+        document.getElementById("student-count-label").textContent =
+          allStudents.length + " active students";
+        renderTable(filteredStudents);
+
+        const wRes = await Sheets.getWatchlist();
+        document.getElementById("watchlist-count").textContent =
+          wRes.watchlistCount || 0;
+
+      } catch (err) {
+        showToast("Failed to load students: " + err.message, "error");
+      }
+    }
+
+    function filterStudents() {
+      const search  = document.getElementById("search-input").value.toLowerCase();
+      const grade   = document.getElementById("filter-grade").value;
+      const type    = document.getElementById("filter-type").value;
+      const balance = document.getElementById("filter-balance").value;
+
+      filteredStudents = allStudents.filter(s => {
+        const matchSearch  = !search ||
+          s.name.toLowerCase().includes(search) ||
+          String(s.admNo).includes(search);
+
+        const matchGrade   = !grade  || s.displayGrade === grade;
+        const matchType    = !type    || s.type === type;
+
+        const bal          = s.balance || 0;
+        const matchBalance = !balance  ||
+          (balance === "positive" && bal > 0) ||
+          (balance === "negative" && bal < 0) ||
+          (balance === "zero"     && bal === 0);
+
+        return matchSearch && matchGrade && matchType && matchBalance;
+      });
+
+      renderTable(filteredStudents);
+    }
+
+    function renderTable(students) {
+      const tbody = document.getElementById("students-table");
+
+      if (students.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="8">
+            <div class="empty-state">
+              <div class="empty-icon">👤</div>
+              <p>No students found</p>
+            </div>
+          </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = students.map(s => {
+        const t      = GREENSHINE.TYPES[s.type] || GREENSHINE.TYPES["0"];
+        const bal    = s.balance || 0;
+        const balCls = bal > 0 ? "text-success" : bal < 0 ? "text-danger" : "text-muted";
+
+        return `
+          <tr class="student-row" onclick="openDetail(${s.admNo})" data-adm="${s.admNo}">
+            <td class="fw-600">${s.name}</td>
+            <td style="color:var(--muted);font-size:12px">${s.admNo}</td>
+            <td>${s.displayGrade}</td>
+            <td>
+              <span class="badge" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">
+                ${s.type} · ${t.label}
+              </span>
+            </td>
+            <td>—</td>
+            <td class="text-right">—</td>
+            <td class="text-right ${balCls} text-mono fw-600">${Sheets.formatBalance(bal)}</td>
+            <td>
+              <button class="btn btn-secondary btn-sm"
+                onclick="event.stopPropagation();openDetail(${s.admNo})">Detail</button>
+            </td>
+          </tr>`;
+      }).join("");
+    }
+
+    function openDetail(admNo) {
+      document.getElementById("detail-panel").classList.add("open");
+    }
+
+    function closeDetail() {
+      document.getElementById("detail-panel").classList.remove("open");
+    }
+
+    function showToast(msg, type = "success") {
+      const icons = { success: "✅", error: "❌", warning: "⚠️" };
+      const el    = document.createElement("div");
+      el.className = `toast ${type}`;
+      el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+      document.getElementById("toast-container").appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+  </script>
+
+</body>
+</html>
