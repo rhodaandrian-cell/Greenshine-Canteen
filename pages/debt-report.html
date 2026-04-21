@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Debt Report — Greenshine Canteen</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/debt-report.css"/>
+</head>
+
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="spinner" style="width:32px;height:32px;border-width:3px"></div>
+    <span>Generating debt report...</span>
+  </div>
+
+  <!-- Report Page -->
+  <div class="report-page" id="report-page" style="display:none">
+
+    <!-- Header -->
+    <div class="report-header">
+      <div>
+        <div class="report-school-name">🍽️ Greenshine Academy</div>
+        <div class="report-school-sub">Canteen Finance System — Confidential</div>
+      </div>
+
+      <div class="report-title-right">
+        <h2>⚠ Student Debt Report</h2>
+        <p>Generated: <span id="gen-date">—</span></p>
+      </div>
+    </div>
+
+    <div class="report-color-bar"></div>
+
+    <!-- Summary -->
+    <div class="report-summary-grid">
+      <div class="rs-card">
+        <div class="rsc-label">Students in Debt</div>
+        <div class="rsc-value text-danger" id="sum-count">—</div>
+        <div class="rsc-sub" id="sum-of-total">—</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rsc-label">Total Outstanding</div>
+        <div class="rsc-value text-danger" id="sum-total">—</div>
+        <div class="rsc-sub">Across all classes</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rsc-label">Highest Debt</div>
+        <div class="rsc-value text-danger" id="sum-highest">—</div>
+        <div class="rsc-sub" id="sum-highest-name">—</div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rsc-label">Classes Affected</div>
+        <div class="rsc-value" id="sum-classes">—</div>
+        <div class="rsc-sub" id="sum-classes-of">—</div>
+      </div>
+    </div>
+
+    <!-- Notice -->
+    <div class="action-notice">
+      ⚠ <strong>Action Required:</strong> Students listed below have negative balances.
+      Please follow up with parents/guardians.
+    </div>
+
+    <!-- Type Summary -->
+    <div class="type-summary-table">
+      <h3>Summary by Payment Type</h3>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Payment Type</th>
+                <th class="text-right">Students</th>
+                <th class="text-right">Total Owed</th>
+              </tr>
+            </thead>
+            <tbody id="type-summary-table">
+              <tr>
+                <td colspan="3">
+                  <div class="loading">
+                    <div class="spinner"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debt by Class -->
+    <h3 style="font-size:13px;font-weight:600;color:var(--light);margin-bottom:16px">
+      Full Debt List — Sorted by Amount Owed
+    </h3>
+
+    <div id="debt-by-class"></div>
+
+    <!-- Total -->
+    <div style="background:rgba(231,76,60,0.08);
+                border:1px solid rgba(231,76,60,0.2);
+                border-radius:var(--radius-sm);
+                padding:14px 16px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-top:8px">
+      <span style="font-size:14px;font-weight:600;color:var(--light)">
+        TOTAL OUTSTANDING
+      </span>
+      <span class="text-danger text-mono fw-600" id="grand-total">—</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="report-footer">
+      <span>Greenshine Academy · Canteen Finance System · Confidential</span>
+      <span id="footer-summary">—</span>
+    </div>
+
+  </div>
+
+  <!-- Actions -->
+  <div class="report-actions">
+    <a href="watchlist.html" class="btn btn-secondary">← Back</a>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Print / PDF</button>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/animation.js"></script>
+  <script src="../js/sheets.js"></script>
+
+  <script>
+    window.addEventListener("load", async () => {
+      initParticleNetwork("particle-canvas");
+      await generateReport();
+    });
+
+    async function generateReport() {
+      try {
+        const studentsRes = await Sheets.getStudentsWithBalances();
+
+        const inDebt = studentsRes
+          .filter(s => (s.balance || 0) < 0)
+          .sort((a, b) => a.balance - b.balance);
+
+        const totalOwed = inDebt.reduce(
+          (sum, s) => sum + Math.abs(s.balance || 0), 0
+        );
+
+        const worst = inDebt[0];
+
+        const classesSet = new Set(inDebt.map(s => s.displayGrade));
+        const allClasses = new Set(studentsRes.map(s => s.displayGrade));
+
+        const now = new Date();
+        document.getElementById("gen-date").textContent =
+          now.toLocaleDateString("en-KE");
+
+        document.getElementById("sum-count").textContent = inDebt.length;
+        document.getElementById("sum-total").textContent =
+          "KES " + totalOwed.toLocaleString();
+
+        document.getElementById("sum-highest").textContent =
+          worst ? Sheets.formatBalance(worst.balance) : "—";
+
+        document.getElementById("sum-highest-name").textContent =
+          worst ? worst.name : "—";
+
+        document.getElementById("sum-classes").textContent =
+          classesSet.size;
+
+        document.getElementById("sum-classes-of").textContent =
+          `of ${allClasses.size} total classes`;
+
+        document.getElementById("grand-total").textContent =
+          "KES " + totalOwed.toLocaleString();
+
+        document.getElementById("footer-summary").textContent =
+          `${inDebt.length} students in debt`;
+
+        renderTypeSummary(inDebt);
+        renderDebtByClass(inDebt);
+
+        document.getElementById("loading-overlay").style.display = "none";
+        document.getElementById("report-page").style.display = "block";
+
+      } catch (err) {
+        document.getElementById("loading-overlay").innerHTML = `
+          <div style="color:red;text-align:center">
+            <div>Failed to generate report</div>
+            <small>${err.message}</small>
+          </div>`;
+      }
+    }
+
+    function renderTypeSummary(inDebt) {
+      const byType = {};
+
+      inDebt.forEach(s => {
+        const t = s.type || "0";
+        if (!byType[t]) byType[t] = { count: 0, total: 0 };
+        byType[t].count++;
+        byType[t].total += Math.abs(s.balance || 0);
+      });
+
+      document.getElementById("type-summary-table").innerHTML =
+        Object.entries(byType).map(([key, data]) => {
+          const t = GREENSHINE.TYPES[key] || GREENSHINE.TYPES["0"];
+          return `
+            <tr>
+              <td>
+                <span class="badge"
+                  style="background:${t.color}20;color:${t.color};
+                         border:1px solid ${t.color}40">
+                  ${key} · ${t.label}
+                </span>
+              </td>
+              <td class="text-right">${data.count}</td>
+              <td class="text-right text-danger">
+                KES ${data.total.toLocaleString()}
+              </td>
+            </tr>`;
+        }).join("");
+    }
+
+    function renderDebtByClass(inDebt) {
+      const byClass = {};
+
+      inDebt.forEach(s => {
+        const g = s.displayGrade || "Unknown";
+        if (!byClass[g]) byClass[g] = [];
+        byClass[g].push(s);
+      });
+
+      document.getElementById("debt-by-class").innerHTML =
+        Object.entries(byClass).map(([grade, students]) => {
+          const total = students.reduce(
+            (sum, s) => sum + Math.abs(s.balance || 0), 0
+          );
+
+          return `
+            <div class="class-section">
+              <div class="class-section-header">
+                <span>${grade} (${students.length})</span>
+                <span>Total: KES ${total.toLocaleString()}</span>
+              </div>
+            </div>`;
+        }).join("");
+    }
+  </script>
+
+</body>
+</html>

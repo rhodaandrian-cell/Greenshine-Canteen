@@ -1,0 +1,169 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   watchlist.css — Watchlist & Alerts Page Styles
+   ============================================================ */
+
+/* ── Section Headers ──────────────────────────────────────── */
+.watchlist-section {
+  margin-bottom: 28px;
+}
+
+.watchlist-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.watchlist-section-title.warning {
+  color: var(--warning);
+}
+
+.watchlist-section-title.danger {
+  color: var(--danger);
+}
+
+.watchlist-section-title .count-badge {
+  background: rgba(255,255,255,0.08);
+  color: var(--light);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: auto;
+}
+
+/* ── Summary Cards ────────────────────────────────────────── */
+.watchlist-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.summary-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  transition: var(--transition);
+}
+
+.summary-card.danger {
+  border-color: rgba(231,76,60,0.3);
+  background: rgba(231,76,60,0.05);
+}
+
+.summary-card.warning {
+  border-color: rgba(243,156,18,0.3);
+  background: rgba(243,156,18,0.05);
+}
+
+.summary-card .s-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.summary-card .s-value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.summary-card.danger .s-value {
+  color: var(--danger);
+}
+
+.summary-card.warning .s-value {
+  color: var(--warning);
+}
+
+.summary-card .s-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ── Days Badge ───────────────────────────────────────────── */
+.days-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(243,156,18,0.15);
+  color: var(--warning);
+  border: 1px solid rgba(243,156,18,0.3);
+}
+
+.days-badge.critical {
+  background: rgba(231,76,60,0.15);
+  color: var(--danger);
+  border: 1px solid rgba(231,76,60,0.3);
+}
+
+/* ── Empty State ──────────────────────────────────────────── */
+.all-clear {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--success);
+  font-size: 14px;
+}
+
+.all-clear .clear-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+/* ── Download Button ──────────────────────────────────────── */
+.download-btn {
+  background: rgba(192,57,43,0.15);
+  border: 1px solid rgba(192,57,43,0.3);
+  color: var(--accent);
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: rgba(192,57,43,0.25);
+}
+
+/* ── Total Outstanding ────────────────────────────────────── */
+.outstanding-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.outstanding-total .ot-label {
+  color: var(--muted);
+}
+
+.outstanding-total .ot-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--danger);
+  font-family: var(--font-mono);
+}

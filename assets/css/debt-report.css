@@ -1,0 +1,254 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   debt-report.css — Printable Debt Report Styles
+   ============================================================ */
+
+/* ── Report Page ──────────────────────────────────────────── */
+.report-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  background: var(--dark-2);
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.report-school-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--light);
+}
+
+.report-school-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.report-title-right {
+  text-align: right;
+}
+
+.report-title-right h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.report-title-right p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── Color Bar ────────────────────────────────────────────── */
+.report-color-bar {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--primary),
+    var(--secondary),
+    var(--accent)
+  );
+  border-radius: 2px;
+  margin: 16px 0 24px;
+}
+
+/* ── Summary Grid ─────────────────────────────────────────── */
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.rs-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.rsc-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.rsc-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rsc-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── Action Notice ────────────────────────────────────────── */
+.action-notice {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--light);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* ── Type Summary Table ───────────────────────────────────── */
+.type-summary-table {
+  margin-bottom: 28px;
+}
+
+.type-summary-table h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light);
+  margin-bottom: 12px;
+}
+
+/* ── Class Section ────────────────────────────────────────── */
+.class-section {
+  margin-bottom: 24px;
+}
+
+.class-section-header {
+  background: rgba(139,58,42,0.15);
+  border: 1px solid rgba(139,58,42,0.3);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light);
+}
+
+.class-section-header .class-total {
+  font-family: var(--font-mono);
+  color: var(--danger);
+}
+
+.class-section .card {
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  border-top: none;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.report-footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+
+/* ── Action Buttons ──────────────────────────────────────── */
+.report-actions {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+/* ── Loading Overlay ──────────────────────────────────────── */
+#loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 14px;
+  z-index: 999;
+}
+
+/* ── Print Styles ─────────────────────────────────────────── */
+@media print {
+
+  #particle-canvas,
+  .report-actions,
+  #loading-overlay {
+    display: none !important;
+  }
+
+  body,
+  .report-page {
+    background: white !important;
+    color: black !important;
+    padding: 20px !important;
+  }
+
+  .report-school-name,
+  .report-title-right h2,
+  .class-section-header {
+    color: black !important;
+  }
+
+  .report-color-bar {
+    background: #333 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rs-card,
+  .card,
+  .action-notice {
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
+
+  thead th {
+    background: #f5f5f5 !important;
+    color: black !important;
+  }
+
+  tbody td {
+    color: black !important;
+  }
+
+  .text-danger {
+    color: #c0392b !important;
+  }
+
+  .text-success {
+    color: #27ae60 !important;
+  }
+
+  .text-muted {
+    color: #666 !important;
+  }
+
+  .rsc-value {
+    color: black !important;
+  }
+
+  .report-footer {
+    color: #666 !important;
+  }
+}

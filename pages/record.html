@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Record Transaction — Greenshine Canteen</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/record.css"/>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<div class="app-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="avatar">G</div>
+      <div class="sidebar-logo-text">
+        <h1>Greenshine Academy</h1>
+        <span>Canteen Finance System</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Main</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+      <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
+      <a class="nav-item active" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
+    </nav>
+
+    <div class="sidebar-section-label">Alerts</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="watchlist.html">
+        <span class="nav-icon">⚠️</span> Watchlist
+        <span class="nav-badge" id="watchlist-count">—</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">Reports</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="avatar">A</div>
+      <div>
+        <div style="font-size:13px;color:var(--light)">Tr Jedida</div>
+        <div style="font-size:11px;color:var(--muted)">Administrator</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <div class="main-content">
+
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Record Transaction</div>
+        <div class="topbar-date" id="today-date">—</div>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" id="tbtn-payment">💰 Record Payment</button>
+        <button class="tab-btn" id="tbtn-meal">🍽️ Record Meal</button>
+        <button class="tab-btn" id="tbtn-bulk">📋 Bulk Daily Record</button>
+      </div>
+
+      <!-- ══ PAYMENT TAB ══ -->
+      <div id="tab-payment" class="tab-content active">
+        <div style="max-width:520px">
+          <div class="card">
+            <div class="card-header">💰 Record a Payment</div>
+            <div class="card-body">
+
+              <div class="form-group">
+                <label class="form-label">Student</label>
+                <div class="autocomplete-wrap">
+                  <input type="text" id="pay-search" class="form-control"
+                    placeholder="Type student name..." autocomplete="off"/>
+                  <div class="autocomplete-list" id="pay-dropdown"></div>
+                </div>
+                <div id="pay-selected" class="student-selected-bar mt-8" style="display:none">
+                  <div>
+                    <div class="s-name" id="pay-s-name">—</div>
+                    <div class="s-meta" id="pay-s-meta">—</div>
+                  </div>
+                  <div class="s-bal" id="pay-s-bal">—</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Amount (KES)</label>
+                <input type="number" id="pay-amount" class="form-control" min="1"/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Reference</label>
+                <input type="text" id="pay-ref" class="form-control"/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" id="pay-date" class="form-control"/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Recorded By</label>
+                <input type="text" id="pay-recorded-by" class="form-control" value="Tr Jedida"/>
+              </div>
+
+              <div class="deduction-summary" id="pay-preview" style="display:none">
+                <div class="deduction-row">
+                  <span>Current Balance</span>
+                  <span id="pay-prev-current">—</span>
+                </div>
+                <div class="deduction-row">
+                  <span>Payment</span>
+                  <span id="pay-prev-amount">—</span>
+                </div>
+                <div class="deduction-row total">
+                  <span>Balance After</span>
+                  <span id="pay-prev-after">—</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="pay-btn" disabled>
+                ✅ Confirm Payment
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MEAL TAB ══ -->
+      <div id="tab-meal" class="tab-content">
+        <div style="max-width:520px">
+          <div class="card">
+            <div class="card-header">🍽️ Record Meal</div>
+            <div class="card-body">
+
+              <div class="form-group">
+                <label class="form-label">Student</label>
+                <div class="autocomplete-wrap">
+                  <input type="text" id="meal-search" class="form-control"/>
+                  <div class="autocomplete-list" id="meal-dropdown"></div>
+                </div>
+                <div id="meal-selected" class="student-selected-bar mt-8" style="display:none">
+                  <div>
+                    <div class="s-name" id="meal-s-name">—</div>
+                    <div class="s-meta" id="meal-s-meta">—</div>
+                  </div>
+                  <div class="s-bal" id="meal-s-bal">—</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" id="meal-date" class="form-control"/>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Items</label>
+
+                <label><input type="checkbox" id="meal-food"/> Lunch (KES 50)</label>
+                <label><input type="checkbox" id="meal-tea"/> Tea (KES 15)</label>
+                <label><input type="checkbox" id="meal-porridge"/> Porridge (KES 10)</label>
+              </div>
+
+              <div class="deduction-summary">
+                <div class="deduction-row">
+                  <span>Deduction</span>
+                  <span id="meal-prev-deduction">KES 0</span>
+                </div>
+                <div class="deduction-row">
+                  <span>Current Balance</span>
+                  <span id="meal-prev-current">—</span>
+                </div>
+                <div class="deduction-row total">
+                  <span>Balance After</span>
+                  <span id="meal-prev-after">—</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="meal-btn" disabled>
+                Confirm
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ BULK TAB ══ -->
+      <div id="tab-bulk" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            📋 Bulk Daily Record
+            <select id="bulk-grade"></select>
+            <input type="date" id="bulk-date"/>
+          </div>
+
+          <div class="card-body">
+            <div id="bulk-rows"></div>
+
+            <div id="bulk-footer" style="display:none">
+              <button class="btn btn-primary" id="bulk-process-btn">
+                Process All (<span id="pending-count">0</span>)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="meal-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirm</div>
+      <button id="meal-modal-cancel">✕</button>
+    </div>
+    <div id="meal-modal-content"></div>
+    <div class="modal-actions">
+      <button id="meal-modal-cancel-2">Cancel</button>
+      <button id="meal-modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bulk-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="bulk-modal-title">Confirm</div>
+      <button id="bulk-modal-close">✕</button>
+    </div>
+    <div id="bulk-modal-content"></div>
+    <div class="modal-actions">
+      <button id="bulk-modal-skip">Skip</button>
+      <button id="bulk-modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- JS -->
+<script src="../js/config.js"></script>
+<script src="../js/sheets.js"></script>
+<script src="../js/animation.js"></script>
+<script src="../js/record-init.js"></script>
+<script src="../js/recordpayment.js"></script>
+<script src="../js/recordmeal.js"></script>
+<script src="../js/dailyrecord.js"></script>
+<script src="../js/record-events.js"></script>
+<script src="../js/sidebar.js"></script>
+
+</body>
+</html>

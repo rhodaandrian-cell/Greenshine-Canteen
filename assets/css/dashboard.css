@@ -1,0 +1,66 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   dashboard.css — Dashboard Page Styles
+   ============================================================ */
+
+/* ── Class Breakdown Item ─────────────────────────────────── */
+.class-item {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  padding        : 10px 0;
+  border-bottom  : 1px solid var(--border);
+  transition     : var(--transition);
+}
+
+.class-item:last-child {
+  border-bottom: none;
+}
+
+.class-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.class-item-left .class-name {
+  font-size  : 14px;
+  font-weight: 500;
+  color      : var(--light);
+}
+
+.class-item-left .class-students {
+  font-size : 12px;
+  color     : var(--muted);
+  margin-top: 2px;
+}
+
+.class-item-balance {
+  font-size  : 15px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* ── Today's meals empty ──────────────────────────────────── */
+.no-meals {
+  text-align: center;
+  padding   : 32px 20px;
+  color     : var(--muted);
+  font-size : 13px;
+}
+
+.no-meals .no-meals-icon {
+  font-size    : 28px;
+  margin-bottom: 8px;
+}
+
+/* ── Dashboard two column layout ──────────────────────────── */
+.dashboard-grid {
+  display              : grid;
+  grid-template-columns: 1fr 1fr;
+  gap                  : 20px;
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

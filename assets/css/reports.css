@@ -1,0 +1,157 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   reports.css — Reports Page Styles
+   ============================================================ */
+
+/* ── Report Summary Cards ─────────────────────────────────── */
+.report-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.report-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.report-stat .rs-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.report-stat .rs-value {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.report-stat .rs-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ── Date Range Picker ────────────────────────────────────── */
+.date-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.date-controls .form-control {
+  width: auto;
+}
+
+/* ── Report Table Enhancements ────────────────────────────── */
+.report-table-wrap {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.type-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.type-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.type-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.type-card-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light);
+}
+
+.type-card-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.type-card-balance {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ── Print Button ─────────────────────────────────────────── */
+.print-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--light);
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.print-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ── Weekly Grid ──────────────────────────────────────────── */
+.week-day-header {
+  display: grid;
+  grid-template-columns: 2fr repeat(5, 1fr);
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: 2fr repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  align-items: center;
+}
+
+.week-row:last-child {
+  border-bottom: none;
+}
+
+.week-cell-meal {
+  font-size: 11px;
+  color: var(--warning);
+  font-family: var(--font-mono);
+}
+
+.week-cell-empty {
+  color: var(--muted-2);
+  font-size: 12px;
+}

@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/dashboard.css"/>
 </head>
 <body>
 
-  <!-- Particle Background -->
   <canvas id="particle-canvas"></canvas>
 
   <div class="app-layout">
 
-    <!-- ── Sidebar ── -->
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-logo">
         <div class="avatar">G</div>
@@ -54,56 +54,64 @@
       <div class="sidebar-footer">
         <div class="avatar">A</div>
         <div>
-          <div style="font-size:13px;color:var(--light)">Admin</div>
+          <div style="font-size:13px;color:var(--light)">Tr Jedida</div>
           <div style="font-size:11px;color:var(--muted)">Administrator</div>
         </div>
       </div>
     </aside>
 
-    <!-- ── Main Content ── -->
+    <!-- Main Content -->
     <div class="main-content">
 
-      <!-- Topbar -->
       <div class="topbar">
         <div>
           <div class="topbar-title">Dashboard</div>
           <div class="topbar-date" id="today-date">—</div>
         </div>
+
         <div class="topbar-actions">
-          <a href="watchlist.html" class="btn btn-danger btn-sm" id="alert-btn" style="display:none">
+          <a href="watchlist.html" class="btn btn-danger btn-sm"
+             id="alert-btn" style="display:none">
             ⚠️ <span id="alert-count">0</span> Alerts
           </a>
-          <a href="record.html" class="btn btn-primary btn-sm">✏️ Record Transaction</a>
+
+          <a href="record.html" class="btn btn-primary btn-sm">
+            ✏️ Record Transaction
+          </a>
         </div>
       </div>
 
-      <!-- Page Body -->
       <div class="page-body">
 
         <!-- Stat Cards -->
-        <div class="stats-grid" id="stats-grid">
+        <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">Active Students</div>
             <div class="stat-value" id="stat-students">—</div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">Net Balance</div>
             <div class="stat-value" id="stat-balance">—</div>
             <div class="stat-sub" id="stat-balance-sub">—</div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">Today Collected</div>
             <div class="stat-value positive" id="stat-collected">—</div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">Today Deducted</div>
             <div class="stat-value warning" id="stat-deducted">—</div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">In Debt</div>
             <div class="stat-value negative" id="stat-debt-count">—</div>
             <div class="stat-sub" id="stat-debt-total">—</div>
           </div>
+
           <div class="stat-card">
             <div class="stat-label">Watchlist</div>
             <div class="stat-value warning" id="stat-watchlist">—</div>
@@ -111,15 +119,17 @@
           </div>
         </div>
 
-        <!-- Two column layout -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
 
-          <!-- Today's Meal Deductions -->
+          <!-- Meals -->
           <div class="card">
             <div class="card-header">
               🍽️ Today's Meal Deductions
-              <span id="meals-count" style="font-size:12px;color:var(--muted);font-weight:400">—</span>
+              <span id="meals-count"
+                style="font-size:12px;color:var(--muted);font-weight:400">—</span>
             </div>
+
             <div class="table-wrap">
               <table>
                 <thead>
@@ -142,11 +152,9 @@
             </div>
           </div>
 
-          <!-- Balance by Class -->
+          <!-- Class Balance -->
           <div class="card">
-            <div class="card-header">
-              📚 Balance by Class
-            </div>
+            <div class="card-header">📚 Balance by Class</div>
             <div class="card-body" id="class-breakdown">
               <div class="loading">
                 <div class="spinner"></div> Loading...
@@ -155,177 +163,17 @@
           </div>
 
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast-container"></div>
 
-  <!-- Scripts -->
   <script src="../js/config.js"></script>
   <script src="../js/animation.js"></script>
   <script src="../js/sheets.js"></script>
-
-  <script>
-    // ── Init ──────────────────────────────────────────────
-    initParticleNetwork("particle-canvas");
-    setTodayDate();
-    loadDashboard();
-
-    function setTodayDate() {
-      const now  = new Date();
-      const opts = { weekday:"long", day:"numeric", month:"long", year:"numeric" };
-      document.getElementById("today-date").textContent =
-        now.toLocaleDateString("en-KE", opts);
-    }
-
-    // ── Load all dashboard data ───────────────────────────
-    async function loadDashboard() {
-      try {
-        const [dashRes, watchRes] = await Promise.all([
-          Sheets.getDashboard(),
-          Sheets.getWatchlist()
-        ]);
-
-        renderStats(dashRes);
-        renderMealsTable(dashRes.todayMeals || []);
-        renderClassBreakdown(dashRes.balanceByClass || {});
-        renderWatchlistBadge(watchRes.watchlistCount || 0);
-
-      } catch (err) {
-        showToast("Failed to load dashboard: " + err.message, "error");
-      }
-    }
-
-    // ── Render stat cards ─────────────────────────────────
-    function renderStats(data) {
-      document.getElementById("stat-students").textContent =
-        data.activeStudents || 0;
-
-      const bal     = data.netBalance || 0;
-      const balEl   = document.getElementById("stat-balance");
-      balEl.textContent  = Sheets.formatBalance(bal);
-      balEl.className    = "stat-value " + Sheets.balanceClass(bal);
-      document.getElementById("stat-balance-sub").textContent =
-        bal >= 0 ? "Net credit" : "Net debt";
-
-      document.getElementById("stat-collected").textContent =
-        Sheets.formatBalance(data.todayCollected || 0);
-
-      document.getElementById("stat-deducted").textContent =
-        Sheets.formatBalance(data.todayDeducted || 0);
-
-      document.getElementById("stat-debt-count").textContent =
-        data.inDebtCount || 0;
-      document.getElementById("stat-debt-total").textContent =
-        Sheets.formatBalance(data.inDebtTotal || 0) + " owed";
-    }
-
-    // ── Render watchlist badge ────────────────────────────
-    function renderWatchlistBadge(count) {
-      document.getElementById("stat-watchlist").textContent = count;
-      document.getElementById("watchlist-count").textContent = count;
-
-      if (count > 0) {
-        document.getElementById("alert-btn").style.display = "flex";
-        document.getElementById("alert-count").textContent = count;
-        document.getElementById("stat-watchlist-sub").textContent =
-          count + " student" + (count !== 1 ? "s" : "") + " flagged";
-      } else {
-        document.getElementById("stat-watchlist-sub").textContent = "All clear";
-      }
-    }
-
-    // ── Render today's meals table ────────────────────────
-    function renderMealsTable(meals) {
-      const tbody = document.getElementById("meals-table");
-      document.getElementById("meals-count").textContent =
-        meals.length + " meal" + (meals.length !== 1 ? "s" : "");
-
-      if (meals.length === 0) {
-        tbody.innerHTML = `
-          <tr><td colspan="3">
-            <div class="empty-state">
-              <div class="empty-icon">🍽️</div>
-              <p>No meals recorded today</p>
-            </div>
-          </td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = meals.map(m => {
-        const items = [
-          m.food     ? '<span class="badge badge-food">Food</span>'         : "",
-          m.tea      ? '<span class="badge badge-tea">Tea</span>'           : "",
-          m.porridge ? '<span class="badge badge-porridge">Porridge</span>' : ""
-        ].filter(Boolean).join(" ");
-
-        return `
-          <tr>
-            <td class="fw-600">${m.name}</td>
-            <td>${items}</td>
-            <td class="text-right text-mono">${Sheets.formatBalance(m.amount)}</td>
-          </tr>`;
-      }).join("");
-    }
-
-    // ── Render class breakdown ────────────────────────────
-    function renderClassBreakdown(byClass) {
-      const container = document.getElementById("class-breakdown");
-
-      const gradeOrder = ["PP1","PP2","PG","0","1","2","3","4","5","6"];
-      const gradeLabels = {
-        "0":"ECD", "1":"Grade 1", "2":"Grade 2", "3":"Grade 3",
-        "4":"Grade 4", "5":"Grade 5", "6":"Grade 6",
-        "PP1":"PP1", "PP2":"PP2", "PG":"PG"
-      };
-
-      const keys = Object.keys(byClass).sort((a, b) => {
-        return gradeOrder.indexOf(String(a)) - gradeOrder.indexOf(String(b));
-      });
-
-      if (keys.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📚</div>
-            <p>No balance data yet</p>
-          </div>`;
-        return;
-      }
-
-      container.innerHTML = keys.map(grade => {
-        const data    = byClass[grade];
-        const bal     = data.balance || 0;
-        const label   = gradeLabels[String(grade)] || "Grade " + grade;
-        const color   = bal >= 0 ? "var(--success)" : "var(--danger)";
-        const balText = Sheets.formatBalance(bal);
-
-        return `
-          <div style="display:flex;align-items:center;justify-content:space-between;
-                      padding:10px 0;border-bottom:1px solid var(--border)">
-            <div>
-              <div style="font-size:14px;font-weight:500">${label}</div>
-              <div style="font-size:12px;color:var(--muted)">${data.students} student${data.students !== 1 ? "s" : ""}</div>
-            </div>
-            <div style="font-size:15px;font-weight:600;color:${color};font-family:var(--font-mono)">
-              ${balText}
-            </div>
-          </div>`;
-      }).join("");
-    }
-
-    // ── Toast helper ──────────────────────────────────────
-    function showToast(msg, type = "success") {
-      const icons = { success: "✅", error: "❌", warning: "⚠️" };
-      const el    = document.createElement("div");
-      el.className = `toast ${type}`;
-      el.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
-      document.getElementById("toast-container").appendChild(el);
-      setTimeout(() => el.remove(), 4000);
-    }
-  </script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/sidebar.js"></script>
 
 </body>
 </html>
