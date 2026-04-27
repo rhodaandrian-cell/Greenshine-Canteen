@@ -27,6 +27,7 @@ function loadBulkClass() {
   container.innerHTML =
     '<div class="loading"><div class="spinner"></div> Loading ' + grade + '...</div>';
 
+  // Match by displayGrade — dropdown value = displayGrade label
   bulkStudents = allStudents.filter(function (s) {
     return s.displayGrade === grade;
   });
@@ -41,6 +42,7 @@ function loadBulkClass() {
     return;
   }
 
+  // Sort: most meals first → occasional → never eaten
   bulkStudents.sort(function (a, b) {
     return (allTxHistory[b.admNo] || 0) - (allTxHistory[a.admNo] || 0);
   });
@@ -56,7 +58,6 @@ function renderBulkRows() {
   if (!container) return;
 
   var html = "";
-
   bulkStudents.forEach(function (s, idx) {
     var t      = GREENSHINE.TYPES[s.type] || GREENSHINE.TYPES["0"];
     var bal    = s.balance || 0;
@@ -67,38 +68,79 @@ function renderBulkRows() {
     html +=
       '<div class="bulk-row" id="bulk-row-' + idx + '">' +
 
+        // ── Desktop: grid columns ──
+        // Student name + meta
         '<div>' +
-          '<div style="font-weight:500">' + flame + s.name + '</div>' +
-          '<div style="font-size:11px;color:var(--muted)">' +
+          '<div class="bulk-student-name">' + flame + s.name + '</div>' +
+          '<div class="bulk-student-meta">' +
             '<span class="text-mono ' + balCls + '">' + Sheets.formatBalance(bal) + '</span>' +
             (meals > 0
-              ? ' · <span style="color:var(--muted-2)">' + meals + ' meal' + (meals !== 1 ? 's' : '') + '</span>'
-              : ' · <span style="color:var(--muted-2)">no meals yet</span>') +
+              ? ' · ' + meals + ' meal' + (meals !== 1 ? 's' : '')
+              : ' · no meals yet') +
           '</div>' +
         '</div>' +
 
-        '<div>' +
-          '<span class="badge" style="background:' + t.color + '20;color:' + t.color + ';border:1px solid ' + t.color + '40;font-size:11px">' +
-            s.type +
-          '</span>' +
+        // Type badge (hidden on mobile)
+        '<div class="bulk-type-badge">' +
+          '<span class="badge" style="background:' + t.color + '20;color:' + t.color + ';' +
+            'border:1px solid ' + t.color + '40;font-size:11px">' + s.type + '</span>' +
         '</div>' +
 
+        // Lunch checkbox
         '<div style="text-align:center">' +
           '<input type="checkbox" class="bulk-food" data-idx="' + idx + '"/>' +
         '</div>' +
 
+        // Tea checkbox
         '<div style="text-align:center">' +
           '<input type="checkbox" class="bulk-tea" data-idx="' + idx + '"/>' +
         '</div>' +
 
+        // Porridge checkbox
         '<div style="text-align:center">' +
           '<input type="checkbox" class="bulk-porridge" data-idx="' + idx + '"/>' +
         '</div>' +
 
+        // Cost
         '<div class="bulk-cost" id="bulk-cost-' + idx + '">KES 0</div>' +
 
+        // Status
         '<div style="text-align:right">' +
           '<span class="bulk-status-pending" id="bulk-status-' + idx + '">Pending</span>' +
+        '</div>' +
+
+        // ── Mobile only: card layout ──
+        // Three checkbox cards shown below name on phone
+        '<div class="bulk-checks">' +
+
+          '<label class="bulk-check-item">' +
+            '<span class="check-icon">🍽️</span>' +
+            '<input type="checkbox" class="bulk-food-m" data-idx="' + idx + '"/>' +
+            '<span class="check-label check-label-lunch">Lunch</span>' +
+            '<span class="check-price">KES 50</span>' +
+          '</label>' +
+
+          '<label class="bulk-check-item">' +
+            '<span class="check-icon">☕</span>' +
+            '<input type="checkbox" class="bulk-tea-m" data-idx="' + idx + '"/>' +
+            '<span class="check-label check-label-tea">Tea</span>' +
+            '<span class="check-price">KES 15</span>' +
+          '</label>' +
+
+          '<label class="bulk-check-item">' +
+            '<span class="check-icon">🌾</span>' +
+            '<input type="checkbox" class="bulk-porridge-m" data-idx="' + idx + '"/>' +
+            '<span class="check-label check-label-porridge">Porridge</span>' +
+            '<span class="check-price">KES 10</span>' +
+          '</label>' +
+
+        '</div>' +
+
+        // Cost + status footer for mobile card
+        '<div class="bulk-footer-row">' +
+          '<span class="bulk-cost" id="bulk-cost-m-' + idx + '" ' +
+            'style="color:var(--warning);font-family:var(--font-mono)">KES 0</span>' +
+          '<span class="bulk-status-pending" id="bulk-status-m-' + idx + '">Pending</span>' +
         '</div>' +
 
       '</div>';
@@ -106,27 +148,66 @@ function renderBulkRows() {
 
   container.innerHTML = html;
 
+  // Attach listeners — sync desktop + mobile checkboxes
   bulkStudents.forEach(function (s, idx) {
+    // Desktop checkboxes
     ["bulk-food", "bulk-tea", "bulk-porridge"].forEach(function (cls) {
       var el = container.querySelector("." + cls + '[data-idx="' + idx + '"]');
       if (el) el.addEventListener("change", function () {
+        syncMobileCheckbox(idx);
+        updateBulkCost(idx);
+      });
+    });
+
+    // Mobile checkboxes — sync back to desktop
+    ["bulk-food-m", "bulk-tea-m", "bulk-porridge-m"].forEach(function (cls) {
+      var el = container.querySelector("." + cls + '[data-idx="' + idx + '"]');
+      if (el) el.addEventListener("change", function () {
+        syncDesktopCheckbox(idx);
         updateBulkCost(idx);
       });
     });
   });
 }
 
+// ── Sync mobile → desktop checkboxes ─────────────────────────
+function syncDesktopCheckbox(idx) {
+  var map = [
+    ["bulk-food-m",     "bulk-food"    ],
+    ["bulk-tea-m",      "bulk-tea"     ],
+    ["bulk-porridge-m", "bulk-porridge"]
+  ];
+  map.forEach(function(pair) {
+    var mobile  = document.querySelector("." + pair[0] + '[data-idx="' + idx + '"]');
+    var desktop = document.querySelector("." + pair[1] + '[data-idx="' + idx + '"]');
+    if (mobile && desktop) desktop.checked = mobile.checked;
+  });
+}
+
+// ── Sync desktop → mobile checkboxes ─────────────────────────
+function syncMobileCheckbox(idx) {
+  var map = [
+    ["bulk-food",     "bulk-food-m"    ],
+    ["bulk-tea",      "bulk-tea-m"     ],
+    ["bulk-porridge", "bulk-porridge-m"]
+  ];
+  map.forEach(function(pair) {
+    var desktop = document.querySelector("." + pair[0] + '[data-idx="' + idx + '"]');
+    var mobile  = document.querySelector("." + pair[1] + '[data-idx="' + idx + '"]');
+    if (desktop && mobile) mobile.checked = desktop.checked;
+  });
+}
+
 // ── Update cost for one row ───────────────────────────────────
 function updateBulkCost(idx) {
-  var food     = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-  var tea      = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
+  var food     = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+  var tea      = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
   var porridge = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
-
   if (!food) return;
 
   var cost =
-    (food.checked ? 50 : 0) +
-    (tea && tea.checked ? 15 : 0) +
+    (food.checked               ? 50 : 0) +
+    (tea      && tea.checked    ? 15 : 0) +
     (porridge && porridge.checked ? 10 : 0);
 
   var costEl = document.getElementById("bulk-cost-" + idx);
@@ -135,28 +216,22 @@ function updateBulkCost(idx) {
   updatePendingCount();
 }
 
-// ── Count pending students ────────────────────────────────────
+// ── Count ticked pending students ────────────────────────────
 function updatePendingCount() {
   var pending = 0;
-
   bulkStudents.forEach(function (s, idx) {
     var st = document.getElementById("bulk-status-" + idx);
     if (!st || st.classList.contains("bulk-status-done")) return;
-
-    var f = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-    var t = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
+    var f = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+    var t = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
     var p = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
-
-    if (f && (f.checked || (t && t.checked) || (p && p.checked))) {
-      pending++;
-    }
+    if (f && (f.checked || (t && t.checked) || (p && p.checked))) pending++;
   });
-
   var el = document.getElementById("pending-count");
   if (el) el.textContent = pending;
 }
 
-// ── Build queue ───────────────────────────────────────────────
+// ── Build queue from ticked rows and start processing ─────────
 function processBulk() {
   bulkQueue = [];
 
@@ -164,23 +239,18 @@ function processBulk() {
     var st = document.getElementById("bulk-status-" + idx);
     if (st && st.classList.contains("bulk-status-done")) return;
 
-    var f = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-    var t = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
+    var f = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+    var t = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
     var p = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
-
     if (!f) return;
 
-    var fC = f.checked;
-    var tC = t && t.checked;
-    var pC = p && p.checked;
-
-    var cost =
-      (fC ? 50 : 0) +
-      (tC ? 15 : 0) +
-      (pC ? 10 : 0);
+    var fC   = f.checked;
+    var tC   = t && t.checked;
+    var pC   = p && p.checked;
+    var cost = (fC ? 50 : 0) + (tC ? 15 : 0) + (pC ? 10 : 0);
 
     if (cost > 0) {
-      bulkQueue.push({ s, idx, food: fC, tea: tC, porridge: pC, cost });
+      bulkQueue.push({ s: s, idx: idx, food: fC, tea: tC, porridge: pC, cost: cost });
     }
   });
 
@@ -193,33 +263,33 @@ function processBulk() {
   showBulkModal();
 }
 
-// ── Modal ─────────────────────────────────────────────────────
+// ── Show confirm modal for current student in queue ───────────
 function showBulkModal() {
   var modalEl   = document.getElementById("bulk-modal");
   var titleEl   = document.getElementById("bulk-modal-title");
   var contentEl = document.getElementById("bulk-modal-content");
-
   if (!modalEl || !titleEl || !contentEl) return;
 
+  // All done
   if (bulkIndex >= bulkQueue.length) {
     modalEl.classList.remove("open");
     showToast(
-      "Bulk record complete! " + bulkQueue.length + " student" +
-      (bulkQueue.length !== 1 ? "s" : "") + " processed.",
+      "Bulk record complete! " + bulkQueue.length +
+      " student" + (bulkQueue.length !== 1 ? "s" : "") + " processed.",
       "success"
     );
     return;
   }
 
-  var entry = bulkQueue[bulkIndex];
-  var s     = entry.s;
-  var cost  = entry.cost;
-  var bal   = s.balance || 0;
-  var after = bal - cost;
+  var entry    = bulkQueue[bulkIndex];
+  var s        = entry.s;
+  var cost     = entry.cost;
+  var bal      = s.balance || 0;
+  var after    = bal - cost;
 
   var items = [
-    entry.food     ? '<span class="badge badge-food">🍽️ Lunch</span>' : "",
-    entry.tea      ? '<span class="badge badge-tea">☕ Tea</span>' : "",
+    entry.food     ? '<span class="badge badge-food">🍽️ Lunch</span>'       : "",
+    entry.tea      ? '<span class="badge badge-tea">☕ Tea</span>'           : "",
     entry.porridge ? '<span class="badge badge-porridge">🌾 Porridge</span>' : ""
   ].filter(Boolean).join(" ");
 
@@ -251,14 +321,15 @@ function showBulkModal() {
       '</div>' +
       balanceWarningHtml(bal, cost) +
       '<div style="margin-top:10px;color:var(--muted);font-size:13px">' +
-        'Did <strong style="color:var(--light)">' + s.name + '</strong> actually eat/drink these today?' +
+        'Did <strong style="color:var(--light)">' + s.name + '</strong>' +
+        ' actually eat/drink these today?' +
       '</div>' +
     '</div>';
 
   modalEl.classList.add("open");
 }
 
-// ── Confirm student ───────────────────────────────────────────
+// ── Confirm and submit current student ───────────────────────
 async function confirmBulkStudent() {
   var entry = bulkQueue[bulkIndex];
   var s     = entry.s;
@@ -276,22 +347,22 @@ async function confirmBulkStudent() {
       recordedBy : ADMIN_NAME
     });
 
+    // Mark row as done — desktop + mobile
     var statusEl = document.getElementById("bulk-status-" + idx);
-    if (statusEl) {
-      statusEl.textContent = "Done ✅";
-      statusEl.className   = "bulk-status-done";
-    }
+    if (statusEl) { statusEl.textContent = "Done ✅"; statusEl.className = "bulk-status-done"; }
+
+    var statusElM = document.getElementById("bulk-status-m-" + idx);
+    if (statusElM) { statusElM.textContent = "Done ✅"; statusElM.className = "bulk-status-done"; }
 
     var rowEl = document.getElementById("bulk-row-" + idx);
     if (rowEl) rowEl.classList.add("done");
 
+    // Update local state
     allTxHistory[s.admNo] = (allTxHistory[s.admNo] || 0) + 1;
-
-    var found = allStudents.find(a => String(a.admNo) === String(s.admNo));
-    if (found) {
-      found.balance = res.newBalance;
-      found.type    = res.type;
-    }
+    var found = allStudents.find(function (a) {
+      return String(a.admNo) === String(s.admNo);
+    });
+    if (found) { found.balance = res.newBalance; found.type = res.type; }
 
   } catch (err) {
     showToast("Error for " + s.name + ": " + err.message, "error");
@@ -302,7 +373,7 @@ async function confirmBulkStudent() {
   showBulkModal();
 }
 
-// ── Skip ──────────────────────────────────────────────────────
+// ── Skip current student ──────────────────────────────────────
 function skipBulkStudent() {
   bulkIndex++;
   showBulkModal();

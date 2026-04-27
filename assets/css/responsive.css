@@ -246,27 +246,82 @@
   tbody td { font-size: 12px; padding: 10px 8px; white-space: nowrap; }
   thead th  { font-size: 10px; padding: 8px;     white-space: nowrap; }
 
-  /* ── Bulk Daily Record — horizontal scroll ── */
-  .bulk-scroll-wrap {
-    overflow-x             : auto;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* ── Bulk Daily Record — card layout on mobile ── */
 
-  /* Freeze student name column */
+  /* Hide the desktop grid header on mobile */
+  .bulk-row.header { display: none !important; }
+
+  /* Each student row becomes a card */
   .bulk-row {
-    min-width: 600px; /* force horizontal scroll */
+    display      : block !important;
+    background   : rgba(255,255,255,0.03);
+    border       : 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding      : 14px !important;
+    margin-bottom: 10px;
   }
 
-  /* Student name sticky */
-  .bulk-row > div:nth-child(1) {
-    position  : sticky;
-    left      : 0;
-    background: var(--dark-2);
-    z-index   : 2;
-    min-width : 130px;
-    white-space: normal;
-    word-break: break-word;
+  /* Student name on top */
+  .bulk-row .bulk-student-name {
+    font-size    : 14px;
+    font-weight  : 600;
+    color        : var(--light);
+    margin-bottom: 4px;
   }
+
+  .bulk-row .bulk-student-meta {
+    font-size    : 12px;
+    color        : var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* Three checkboxes in a row below name */
+  .bulk-row .bulk-checks {
+    display        : flex;
+    gap            : 8px;
+    margin-bottom  : 10px;
+  }
+
+  .bulk-check-item {
+    flex           : 1;
+    display        : flex;
+    flex-direction : column;
+    align-items    : center;
+    gap            : 4px;
+    background     : rgba(255,255,255,0.05);
+    border         : 1px solid var(--border);
+    border-radius  : var(--radius-sm);
+    padding        : 10px 6px;
+    cursor         : pointer;
+  }
+
+  .bulk-check-item input[type="checkbox"] {
+    width       : 20px;
+    height      : 20px;
+    accent-color: var(--accent);
+    cursor      : pointer;
+  }
+
+  .bulk-check-item .check-icon  { font-size: 18px; }
+  .bulk-check-item .check-label { font-size: 11px; font-weight: 600; }
+  .bulk-check-item .check-price { font-size: 10px; color: var(--muted); }
+
+  .check-label-lunch    { color: #2ecc71; }
+  .check-label-tea      { color: #3498db; }
+  .check-label-porridge { color: #f39c12; }
+
+  /* Cost + status in a row */
+  .bulk-row .bulk-footer-row {
+    display        : flex;
+    align-items    : center;
+    justify-content: space-between;
+    font-size      : 13px;
+    padding-top    : 8px;
+    border-top     : 1px solid var(--border);
+  }
+
+  /* Hide desktop-only elements inside bulk rows */
+  .bulk-row .bulk-type-badge { display: none; }
 
   /* ── Tabs scroll horizontally ── */
   .tabs    { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
