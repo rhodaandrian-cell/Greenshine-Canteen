@@ -217,83 +217,73 @@
 }
 
 /* ============================================================
-   STUDENTS PAGE — Mobile
+   MOBILE — Tables scroll horizontally like Jumia
+   Swipe left to see more columns — nothing is hidden
    ============================================================ */
 @media (max-width: 768px) {
 
-  /* Hide columns that don't fit on phone */
-  .students-table th:nth-child(4),  /* Type        */
-  .students-table td:nth-child(4),
-  .students-table th:nth-child(5),  /* Subscriptions */
-  .students-table td:nth-child(5),
-  .students-table th:nth-child(6),  /* Daily       */
-  .students-table td:nth-child(6) { display: none; }
+  /* ── All tables — horizontal scroll ── */
+  .table-wrap {
+    overflow-x             : auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type       : x proximity;
+  }
 
-  /* Make name column take more space */
-  .students-table td:nth-child(1),
-  .students-table th:nth-child(1) { min-width: 120px; }
+  /* Freeze name column while scrolling */
+  .students-table th:nth-child(1),
+  .students-table td:nth-child(1) {
+    position  : sticky;
+    left      : 0;
+    background: var(--dark-3);
+    z-index   : 2;
+    min-width : 130px;
+    max-width : 130px;
+    white-space: normal;
+    word-break: break-word;
+  }
 
-  /* Smaller font in tables */
-  tbody td { font-size: 12px; padding: 10px 8px; }
-  thead th  { font-size: 10px; padding: 8px;     }
+  /* Slightly smaller text in tables */
+  tbody td { font-size: 12px; padding: 10px 8px; white-space: nowrap; }
+  thead th  { font-size: 10px; padding: 8px;     white-space: nowrap; }
 
-}
+  /* ── Bulk Daily Record — horizontal scroll ── */
+  .bulk-scroll-wrap {
+    overflow-x             : auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
-/* ============================================================
-   BULK DAILY RECORD — Mobile
-   ============================================================ */
-@media (max-width: 768px) {
-
-  /* Stack bulk rows vertically on phone */
+  /* Freeze student name column */
   .bulk-row {
-    grid-template-columns: 1fr 1fr 1fr !important;
-    grid-template-rows   : auto auto;
-    gap                  : 6px;
-    padding              : 12px 0;
+    min-width: 600px; /* force horizontal scroll */
   }
 
-  /* Student name takes full width on first row */
+  /* Student name sticky */
   .bulk-row > div:nth-child(1) {
-    grid-column: 1 / -1;
-    font-size  : 13px;
+    position  : sticky;
+    left      : 0;
+    background: var(--dark-2);
+    z-index   : 2;
+    min-width : 130px;
+    white-space: normal;
+    word-break: break-word;
   }
 
-  /* Header labels smaller */
-  .bulk-header-cell .cell-label { font-size: 10px; }
-  .bulk-header-cell .cell-icon  { font-size: 16px; }
-  .bulk-header-cell .cell-price { display: none;   }
+  /* ── Tabs scroll horizontally ── */
+  .tabs    { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .tab-btn { flex-shrink: 0; font-size: 12px; padding: 8px 12px; }
 
-  /* Cost + status inline */
-  .bulk-cost { font-size: 12px; }
-  .bulk-status-pending,
-  .bulk-status-done { font-size: 11px; }
+  /* ── General mobile tweaks ── */
+  .topbar-title { font-size: 14px; }
+  .topbar-date  { font-size: 11px; }
+  .stats-grid   { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-value   { font-size: 20px; }
+  .stat-label   { font-size: 10px; }
+  .form-control { font-size: 14px; }
+  .btn-sm       { padding: 5px 10px; font-size: 11px; }
+  .autocomplete-list { font-size: 13px; }
+  .autocomplete-item { padding: 12px; }
 
   /* Process button full width */
   #bulk-process-btn { width: 100%; justify-content: center; }
 
-  /* Tabs scroll horizontally */
-  .tabs    { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-  .tab-btn { flex-shrink: 0; font-size: 12px; padding: 8px 12px; }
-
-  /* Page title smaller */
-  .topbar-title { font-size: 14px; }
-  .topbar-date  { font-size: 11px; }
-
-  /* Cards no rounded corners on phone */
-  .card { border-radius: 0; border-left: none; border-right: none; }
-
-  /* Stat cards 2 columns */
-  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .stat-value { font-size: 20px; }
-  .stat-label { font-size: 10px; }
-
-  /* Form controls full width */
-  .form-control { font-size: 14px; }
-
-  /* Buttons smaller */
-  .btn-sm { padding: 5px 10px; font-size: 11px; }
-
-  /* Autocomplete full width */
-  .autocomplete-list { font-size: 13px; }
-  .autocomplete-item { padding: 12px; }
 }
