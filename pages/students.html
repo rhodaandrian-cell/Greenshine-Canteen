@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Students — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/students.css"/>
 </head>
 <body>
@@ -22,20 +23,12 @@
           <span>Canteen Finance System</span>
         </div>
       </div>
-
       <div class="sidebar-section-label">Main</div>
       <nav class="sidebar-nav">
-        <a class="nav-item" href="dashboard.html">
-          <span class="nav-icon">📊</span> Dashboard
-        </a>
-        <a class="nav-item active" href="students.html">
-          <span class="nav-icon">👤</span> Students
-        </a>
-        <a class="nav-item" href="record.html">
-          <span class="nav-icon">✏️</span> Record Transaction
-        </a>
+        <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a class="nav-item active" href="students.html"><span class="nav-icon">👤</span> Students</a>
+        <a class="nav-item" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
       </nav>
-
       <div class="sidebar-section-label">Alerts</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="watchlist.html">
@@ -43,14 +36,10 @@
           <span class="nav-badge" id="watchlist-count">—</span>
         </a>
       </nav>
-
       <div class="sidebar-section-label">Reports</div>
       <nav class="sidebar-nav">
-        <a class="nav-item" href="reports.html">
-          <span class="nav-icon">📋</span> Reports
-        </a>
+        <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
       </nav>
-
       <div class="sidebar-footer">
         <div class="avatar">A</div>
         <div>
@@ -68,11 +57,8 @@
           <div class="topbar-title">Students</div>
           <div class="topbar-date" id="student-count-label">Loading...</div>
         </div>
-
         <div class="topbar-actions">
-          <a href="record.html" class="btn btn-primary btn-sm">
-            ✏️ Record Transaction
-          </a>
+          <a href="record.html" class="btn btn-primary btn-sm">✏️ Record Transaction</a>
         </div>
       </div>
 
@@ -82,15 +68,10 @@
         <div class="filters">
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input
-              type="text"
-              id="search-input"
-              class="form-control search-input"
+            <input type="text" id="search-input" class="form-control search-input"
               placeholder="Search by name or ADM No..."
-              oninput="filterStudents()"
-            />
+              oninput="filterStudents()"/>
           </div>
-
           <select class="form-control" id="filter-grade" onchange="filterStudents()">
             <option value="">All Classes</option>
             <option value="PP1">PP1</option>
@@ -103,7 +84,6 @@
             <option value="Grade 5">Grade 5</option>
             <option value="Grade 6">Grade 6</option>
           </select>
-
           <select class="form-control" id="filter-type" onchange="filterStudents()">
             <option value="">All Types</option>
             <option value="0">0 · Unranked</option>
@@ -112,7 +92,6 @@
             <option value="C">C · Occasional</option>
             <option value="D">D · Non-paying</option>
           </select>
-
           <select class="form-control" id="filter-balance" onchange="filterStudents()">
             <option value="">All Balances</option>
             <option value="positive">Positive</option>
@@ -124,7 +103,7 @@
         <!-- Students Table -->
         <div class="card">
           <div class="table-wrap">
-            <table>
+            <table class="students-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -137,7 +116,6 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-
               <tbody id="students-table">
                 <tr>
                   <td colspan="8">
@@ -161,9 +139,32 @@
       <span style="font-size:14px;font-weight:600">Student Detail</span>
       <button class="modal-close" onclick="closeDetail()">✕</button>
     </div>
-
     <div class="detail-body" id="detail-body"></div>
   </div>
+
+  <!-- Bottom Navigation — mobile phones only -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item" id="bnav-dashboard">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item active" id="bnav-students" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item" id="bnav-record">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item" id="bnav-watchlist">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item" id="bnav-reports">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+  </nav>
 
   <div id="toast-container"></div>
 
@@ -173,5 +174,29 @@
   <script src="../js/students.js"></script>
   <script src="../js/sidebar.js"></script>
 
+
+<!-- Bottom Navigation — mobile phones -->
+<nav class="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+</nav>
 </body>
 </html>

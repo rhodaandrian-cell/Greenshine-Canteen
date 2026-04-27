@@ -1,0 +1,299 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   responsive.css — Mobile, Tablet & Responsive Styles
+   ============================================================ */
+
+/* ── Hamburger Button ─────────────────────────────────────── */
+.hamburger {
+  display       : none;
+  flex-direction: column;
+  gap           : 5px;
+  cursor        : pointer;
+  padding       : 8px;
+  background    : none;
+  border        : none;
+  z-index       : 200;
+}
+
+.hamburger span {
+  display      : block;
+  width        : 22px;
+  height       : 2px;
+  background   : var(--light);
+  border-radius: 2px;
+  transition   : var(--transition);
+}
+
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg);  }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Sidebar Overlay ──────────────────────────────────────── */
+.sidebar-overlay {
+  display   : none;
+  position  : fixed;
+  inset     : 0;
+  background: rgba(0,0,0,0.6);
+  z-index   : 99;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.open { display: block; }
+
+/* ── Bottom Navigation Bar ────────────────────────────────── */
+/* Always in HTML but hidden on desktop/tablet via CSS */
+.bottom-nav {
+  display        : none;  /* hidden by default, shown on phones */
+  position       : fixed;
+  bottom         : 0;
+  left           : 0;
+  right          : 0;
+  height         : 62px;
+  background     : #0d0d0d;
+  border-top     : 1px solid rgba(255,255,255,0.1);
+  z-index        : 9999;
+  flex-direction : row;
+  align-items    : center;
+  justify-content: space-around;
+  padding        : 0 4px;
+}
+
+.bottom-nav-item {
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  justify-content: center;
+  gap            : 3px;
+  flex           : 1;
+  height         : 100%;
+  padding        : 6px 4px;
+  text-decoration: none;
+  color          : #888888;
+  transition     : color 0.2s ease;
+}
+
+.bottom-nav-item.active { color: #C0392B; }
+.bottom-nav-item:active { color: #f5f5f0; }
+
+.bottom-nav-icon  { font-size: 22px; line-height: 1; }
+.bottom-nav-label { font-size: 10px; font-weight: 500; white-space: nowrap; }
+
+/* ── Toast position on mobile ─────────────────────────────── */
+@media (max-width: 768px) {
+  #toast-container {
+    bottom   : 72px;
+    right    : 12px;
+    left     : 12px;
+  }
+  .toast { min-width: unset; width: 100%; }
+}
+
+/* ============================================================
+   BREAKPOINTS
+   ============================================================ */
+
+/* ── Phone (≤ 768px) ──────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Show bottom nav */
+  .bottom-nav { display: flex; }
+
+  /* Hide sidebar completely */
+  .sidebar    { display: none !important; }
+
+  /* Hide hamburger — bottom nav replaces it */
+  .hamburger  { display: none !important; }
+
+  /* Main content full width + space for bottom nav */
+  .main-content {
+    margin-left   : 0 !important;
+    padding-bottom: 70px !important;
+  }
+
+  /* Topbar */
+  .topbar { padding: 0 16px; }
+  .topbar-title { font-size: 15px; }
+  .topbar-actions .btn { padding: 6px 10px; font-size: 12px; }
+
+  /* Page body */
+  .page-body { padding: 16px; }
+
+  /* Stats — single column */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Stat value smaller */
+  .stat-value { font-size: 22px; }
+
+  /* Two column layouts collapse */
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+
+  /* Cards */
+  .card { border-radius: var(--radius-sm); }
+
+  /* Tables scroll */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Modal full width */
+  .modal { max-width: 95vw; padding: 20px 16px; margin: 0 10px; }
+
+  /* Filters stack */
+  .filters { flex-direction: column; }
+  .filters .form-control,
+  .filters .search-wrap { width: 100% !important; max-width: 100% !important; }
+
+  /* Detail panel full width */
+  .detail-panel { width: 100% !important; min-width: unset !important; }
+
+  /* Tabs scroll */
+  .tabs { overflow-x: auto; gap: 0; }
+  .tab-btn { padding: 10px 14px; font-size: 13px; white-space: nowrap; }
+}
+
+/* ── Tablet (769px – 1024px) ──────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  /* Hide bottom nav */
+  .bottom-nav { display: none !important; }
+
+  /* Show hamburger */
+  .hamburger { display: flex; }
+
+  /* Sidebar hidden by default — slides in */
+  .sidebar {
+    transform : translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index   : 100;
+  }
+
+  .sidebar.open { transform: translateX(0); }
+
+  /* Main content full width */
+  .main-content { margin-left: 0 !important; }
+
+  /* Topbar */
+  .topbar { padding: 0 20px; gap: 12px; }
+
+  /* Page body */
+  .page-body { padding: 20px; }
+
+  /* Stats — 3 columns */
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Two col layouts — still two col on tablet */
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Desktop (≥ 1025px) ───────────────────────────────────── */
+@media (min-width: 1025px) {
+
+  /* Hide everything mobile */
+  .bottom-nav      { display: none !important; }
+  .hamburger       { display: none !important; }
+  .sidebar-overlay { display: none !important; }
+
+  /* Sidebar always visible */
+  .sidebar {
+    transform: none !important;
+    display  : flex !important;
+  }
+
+  /* Main content with sidebar */
+  .main-content {
+    margin-left   : var(--sidebar-w) !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Stats — 3+ columns */
+  .stats-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+}
+
+/* ── Touch improvements ───────────────────────────────────── */
+@media (hover: none) {
+  .nav-item                             { padding: 14px 20px; }
+  .btn                                  { min-height: 40px; }
+  .checkbox-item input[type="checkbox"] { width: 22px; height: 22px; }
+  .autocomplete-item                    { padding: 14px; }
+  tbody td                              { padding: 14px 16px; }
+}
+
+/* ============================================================
+   STUDENTS PAGE — Mobile
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* Hide columns that don't fit on phone */
+  .students-table th:nth-child(4),  /* Type        */
+  .students-table td:nth-child(4),
+  .students-table th:nth-child(5),  /* Subscriptions */
+  .students-table td:nth-child(5),
+  .students-table th:nth-child(6),  /* Daily       */
+  .students-table td:nth-child(6) { display: none; }
+
+  /* Make name column take more space */
+  .students-table td:nth-child(1),
+  .students-table th:nth-child(1) { min-width: 120px; }
+
+  /* Smaller font in tables */
+  tbody td { font-size: 12px; padding: 10px 8px; }
+  thead th  { font-size: 10px; padding: 8px;     }
+
+}
+
+/* ============================================================
+   BULK DAILY RECORD — Mobile
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* Stack bulk rows vertically on phone */
+  .bulk-row {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    grid-template-rows   : auto auto;
+    gap                  : 6px;
+    padding              : 12px 0;
+  }
+
+  /* Student name takes full width on first row */
+  .bulk-row > div:nth-child(1) {
+    grid-column: 1 / -1;
+    font-size  : 13px;
+  }
+
+  /* Header labels smaller */
+  .bulk-header-cell .cell-label { font-size: 10px; }
+  .bulk-header-cell .cell-icon  { font-size: 16px; }
+  .bulk-header-cell .cell-price { display: none;   }
+
+  /* Cost + status inline */
+  .bulk-cost { font-size: 12px; }
+  .bulk-status-pending,
+  .bulk-status-done { font-size: 11px; }
+
+  /* Process button full width */
+  #bulk-process-btn { width: 100%; justify-content: center; }
+
+  /* Tabs scroll horizontally */
+  .tabs    { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .tab-btn { flex-shrink: 0; font-size: 12px; padding: 8px 12px; }
+
+  /* Page title smaller */
+  .topbar-title { font-size: 14px; }
+  .topbar-date  { font-size: 11px; }
+
+  /* Cards no rounded corners on phone */
+  .card { border-radius: 0; border-left: none; border-right: none; }
+
+  /* Stat cards 2 columns */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-value { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+
+  /* Form controls full width */
+  .form-control { font-size: 14px; }
+
+  /* Buttons smaller */
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+  /* Autocomplete full width */
+  .autocomplete-list { font-size: 13px; }
+  .autocomplete-item { padding: 12px; }
+}

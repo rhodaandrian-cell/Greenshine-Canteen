@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/dashboard.css"/>
 </head>
 <body>
@@ -22,7 +23,6 @@
           <span>Canteen Finance System</span>
         </div>
       </div>
-
       <div class="sidebar-section-label">Main</div>
       <nav class="sidebar-nav">
         <a class="nav-item active" href="dashboard.html">
@@ -35,7 +35,6 @@
           <span class="nav-icon">✏️</span> Record Transaction
         </a>
       </nav>
-
       <div class="sidebar-section-label">Alerts</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="watchlist.html">
@@ -43,14 +42,12 @@
           <span class="nav-badge" id="watchlist-count">—</span>
         </a>
       </nav>
-
       <div class="sidebar-section-label">Reports</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="reports.html">
           <span class="nav-icon">📋</span> Reports
         </a>
       </nav>
-
       <div class="sidebar-footer">
         <div class="avatar">A</div>
         <div>
@@ -68,13 +65,11 @@
           <div class="topbar-title">Dashboard</div>
           <div class="topbar-date" id="today-date">—</div>
         </div>
-
         <div class="topbar-actions">
           <a href="watchlist.html" class="btn btn-danger btn-sm"
-             id="alert-btn" style="display:none">
+            id="alert-btn" style="display:none">
             ⚠️ <span id="alert-count">0</span> Alerts
           </a>
-
           <a href="record.html" class="btn btn-primary btn-sm">
             ✏️ Record Transaction
           </a>
@@ -89,29 +84,24 @@
             <div class="stat-label">Active Students</div>
             <div class="stat-value" id="stat-students">—</div>
           </div>
-
           <div class="stat-card">
             <div class="stat-label">Net Balance</div>
             <div class="stat-value" id="stat-balance">—</div>
             <div class="stat-sub" id="stat-balance-sub">—</div>
           </div>
-
           <div class="stat-card">
             <div class="stat-label">Today Collected</div>
             <div class="stat-value positive" id="stat-collected">—</div>
           </div>
-
           <div class="stat-card">
             <div class="stat-label">Today Deducted</div>
             <div class="stat-value warning" id="stat-deducted">—</div>
           </div>
-
           <div class="stat-card">
             <div class="stat-label">In Debt</div>
             <div class="stat-value negative" id="stat-debt-count">—</div>
             <div class="stat-sub" id="stat-debt-total">—</div>
           </div>
-
           <div class="stat-card">
             <div class="stat-label">Watchlist</div>
             <div class="stat-value warning" id="stat-watchlist">—</div>
@@ -119,17 +109,16 @@
           </div>
         </div>
 
-        <!-- Dashboard Grid -->
+        <!-- Two Column Grid -->
         <div class="dashboard-grid">
 
-          <!-- Meals -->
+          <!-- Today's Meal Deductions -->
           <div class="card">
             <div class="card-header">
               🍽️ Today's Meal Deductions
               <span id="meals-count"
                 style="font-size:12px;color:var(--muted);font-weight:400">—</span>
             </div>
-
             <div class="table-wrap">
               <table>
                 <thead>
@@ -142,9 +131,7 @@
                 <tbody id="meals-table">
                   <tr>
                     <td colspan="3">
-                      <div class="loading">
-                        <div class="spinner"></div> Loading...
-                      </div>
+                      <div class="loading"><div class="spinner"></div> Loading...</div>
                     </td>
                   </tr>
                 </tbody>
@@ -152,13 +139,11 @@
             </div>
           </div>
 
-          <!-- Class Balance -->
+          <!-- Balance by Class -->
           <div class="card">
             <div class="card-header">📚 Balance by Class</div>
             <div class="card-body" id="class-breakdown">
-              <div class="loading">
-                <div class="spinner"></div> Loading...
-              </div>
+              <div class="loading"><div class="spinner"></div> Loading...</div>
             </div>
           </div>
 
@@ -166,6 +151,30 @@
       </div>
     </div>
   </div>
+
+  <!-- Bottom Navigation — mobile phones only -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item active" id="bnav-dashboard" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item" id="bnav-students">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item" id="bnav-record">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item" id="bnav-watchlist">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item" id="bnav-reports">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+  </nav>
 
   <div id="toast-container"></div>
 
@@ -175,5 +184,29 @@
   <script src="../js/dashboard.js"></script>
   <script src="../js/sidebar.js"></script>
 
+
+<!-- Bottom Navigation — mobile phones -->
+<nav class="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+</nav>
 </body>
 </html>

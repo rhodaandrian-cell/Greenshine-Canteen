@@ -4,11 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Watchlist — Greenshine Canteen</title>
-
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/watchlist.css"/>
 </head>
-
 <body>
 
   <canvas id="particle-canvas"></canvas>
@@ -17,7 +16,6 @@
 
     <!-- ── Sidebar ── -->
     <aside class="sidebar">
-
       <div class="sidebar-logo">
         <div class="avatar">G</div>
         <div class="sidebar-logo-text">
@@ -25,20 +23,12 @@
           <span>Canteen Finance System</span>
         </div>
       </div>
-
       <div class="sidebar-section-label">Main</div>
       <nav class="sidebar-nav">
-        <a class="nav-item" href="dashboard.html">
-          <span class="nav-icon">📊</span> Dashboard
-        </a>
-        <a class="nav-item" href="students.html">
-          <span class="nav-icon">👤</span> Students
-        </a>
-        <a class="nav-item" href="record.html">
-          <span class="nav-icon">✏️</span> Record Transaction
-        </a>
+        <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
+        <a class="nav-item" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
       </nav>
-
       <div class="sidebar-section-label">Alerts</div>
       <nav class="sidebar-nav">
         <a class="nav-item active" href="watchlist.html">
@@ -46,14 +36,10 @@
           <span class="nav-badge" id="watchlist-count">—</span>
         </a>
       </nav>
-
       <div class="sidebar-section-label">Reports</div>
       <nav class="sidebar-nav">
-        <a class="nav-item" href="reports.html">
-          <span class="nav-icon">📋</span> Reports
-        </a>
+        <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
       </nav>
-
       <div class="sidebar-footer">
         <div class="avatar">A</div>
         <div>
@@ -61,7 +47,6 @@
           <div style="font-size:11px;color:var(--muted)">Administrator</div>
         </div>
       </div>
-
     </aside>
 
     <!-- ── Main Content ── -->
@@ -69,10 +54,9 @@
 
       <div class="topbar">
         <div>
-          <div class="topbar-title">Watchlist & Alerts</div>
+          <div class="topbar-title">Watchlist &amp; Alerts</div>
           <div class="topbar-date" id="today-date">—</div>
         </div>
-
         <div class="topbar-actions">
           <button class="download-btn" onclick="downloadDebtReport()">
             ⬇ Download Debt Report PDF
@@ -84,36 +68,30 @@
 
         <!-- Summary Cards -->
         <div class="watchlist-summary">
-
           <div class="summary-card danger">
             <div class="s-label">High Debt</div>
             <div class="s-value" id="sum-high-debt">—</div>
             <div class="s-sub">Balance ≤ −KES 500</div>
           </div>
-
           <div class="summary-card warning">
             <div class="s-label">Missed Payment</div>
             <div class="s-value" id="sum-missed-b">—</div>
             <div class="s-sub">Type B · 14+ days</div>
           </div>
-
           <div class="summary-card danger">
             <div class="s-label">Total Outstanding</div>
             <div class="s-value" id="sum-outstanding">—</div>
-            <div class="s-sub">Across flagged students</div>
+            <div class="s-sub">Across high debt students</div>
           </div>
-
           <div class="summary-card">
             <div class="s-label">Total Flagged</div>
-            <div class="s-value" id="sum-total-count">—</div>
+            <div class="s-value" style="color:var(--light)" id="sum-total-count">—</div>
             <div class="s-sub">Students on watchlist</div>
           </div>
-
         </div>
 
         <!-- High Debt Section -->
         <div class="watchlist-section">
-
           <div class="watchlist-section-title danger">
             ⚠️ High Debt Watchlist
             <span style="font-size:12px;color:var(--muted);font-weight:400">
@@ -135,7 +113,6 @@
                     <th>Action</th>
                   </tr>
                 </thead>
-
                 <tbody id="high-debt-table">
                   <tr>
                     <td colspan="6">
@@ -145,18 +122,14 @@
                     </td>
                   </tr>
                 </tbody>
-
               </table>
             </div>
-
             <div id="high-debt-total" style="padding:0 16px 16px"></div>
           </div>
-
         </div>
 
-        <!-- Missed Payment Section -->
+        <!-- Missed Friday Payment Section -->
         <div class="watchlist-section">
-
           <div class="watchlist-section-title warning">
             ⏰ Type B — Missed Friday Payment
             <span style="font-size:12px;color:var(--muted);font-weight:400">
@@ -178,7 +151,6 @@
                     <th>Action</th>
                   </tr>
                 </thead>
-
                 <tbody id="missed-b-table">
                   <tr>
                     <td colspan="6">
@@ -188,11 +160,9 @@
                     </td>
                   </tr>
                 </tbody>
-
               </table>
             </div>
           </div>
-
         </div>
 
       </div>
@@ -209,5 +179,29 @@
   <script src="../js/watchlist.js"></script>
   <script src="../js/sidebar.js"></script>
 
+
+<!-- Bottom Navigation — mobile phones -->
+<nav class="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+</nav>
 </body>
 </html>

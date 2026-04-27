@@ -1,88 +1,68 @@
 // ============================================================
 // GREENSHINE ACADEMY — Canteen Finance Management System
 // record-events.js — All Event Listeners
-// Loaded LAST so all functions from other files already exist
+// Loaded LAST — wires HTML elements to JS functions
 // ============================================================
 
 window.addEventListener("load", function () {
 
-  // ── Tab buttons ─────────────────────────────────────────────
-  document.getElementById("tbtn-payment")
-    .addEventListener("click", function () { switchTab("payment"); });
+  // Helper — safely attach listener, skip if element missing
+  function on(id, event, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener(event, fn);
+  }
 
-  document.getElementById("tbtn-meal")
-    .addEventListener("click", function () { switchTab("meal"); });
+  // ── Tab buttons ───────────────────────────────────────────
+  on("tbtn-payment", "click", function () { switchTab("payment"); });
+  on("tbtn-meal",    "click", function () { switchTab("meal");    });
+  on("tbtn-bulk",    "click", function () { switchTab("bulk");    });
 
-  document.getElementById("tbtn-bulk")
-    .addEventListener("click", function () { switchTab("bulk"); });
+  // ── Payment search ────────────────────────────────────────
+  on("pay-search", "input", function () {
+    searchStudents("pay", this.value);
+  });
 
-  // ── Payment search input ─────────────────────────────────────
-  document.getElementById("pay-search")
-    .addEventListener("input", function () {
-      searchStudents("pay", this.value);
-    });
+  // ── Payment amount — live preview ─────────────────────────
+  on("pay-amount", "input", updatePayPreview);
 
-  // ── Meal search input ────────────────────────────────────────
-  document.getElementById("meal-search")
-    .addEventListener("input", function () {
-      searchStudents("meal", this.value);
-    });
+  // ── Payment confirm ───────────────────────────────────────
+  on("pay-btn", "click", submitPayment);
 
-  // ── Payment amount — live preview ────────────────────────────
-  document.getElementById("pay-amount")
-    .addEventListener("input", updatePayPreview);
+  // ── Meal search ───────────────────────────────────────────
+  on("meal-search", "input", function () {
+    searchStudents("meal", this.value);
+  });
 
-  // ── Payment confirm button ───────────────────────────────────
-  document.getElementById("pay-btn")
-    .addEventListener("click", submitPayment);
+  // ── Meal checkboxes — live preview ────────────────────────
+  on("meal-food",     "change", updateMealPreview);
+  on("meal-tea",      "change", updateMealPreview);
+  on("meal-porridge", "change", updateMealPreview);
 
-  // ── Meal checkboxes — live preview ───────────────────────────
-  document.getElementById("meal-food")
-    .addEventListener("change", updateMealPreview);
+  // ── Meal confirm button ───────────────────────────────────
+  on("meal-btn", "click", showMealConfirm);
 
-  document.getElementById("meal-tea")
-    .addEventListener("change", updateMealPreview);
+  // ── Meal modal ────────────────────────────────────────────
+  on("meal-modal-cancel",   "click", closeMealModal);
+  on("meal-modal-cancel-2", "click", closeMealModal);
+  on("meal-modal-confirm",  "click", submitMeal);
 
-  document.getElementById("meal-porridge")
-    .addEventListener("change", updateMealPreview);
+  // ── Bulk class dropdown ───────────────────────────────────
+  on("bulk-grade", "change", loadBulkClass);
 
-  // ── Meal confirm button ──────────────────────────────────────
-  document.getElementById("meal-btn")
-    .addEventListener("click", showMealConfirm);
+  // ── Bulk process button ───────────────────────────────────
+  on("bulk-process-btn", "click", processBulk);
 
-  // ── Meal modal buttons ───────────────────────────────────────
-  document.getElementById("meal-modal-cancel")
-    .addEventListener("click", closeMealModal);
+  // ── Bulk modal ────────────────────────────────────────────
+  on("bulk-modal-close",   "click", skipBulkStudent);
+  on("bulk-modal-skip",    "click", skipBulkStudent);
+  on("bulk-modal-confirm", "click", confirmBulkStudent);
 
-  document.getElementById("meal-modal-cancel-2")
-    .addEventListener("click", closeMealModal);
-
-  document.getElementById("meal-modal-confirm")
-    .addEventListener("click", submitMeal);
-
-  // ── Bulk class dropdown ──────────────────────────────────────
-  document.getElementById("bulk-grade")
-    .addEventListener("change", loadBulkClass);
-
-  // ── Bulk process button ──────────────────────────────────────
-  document.getElementById("bulk-process-btn")
-    .addEventListener("click", processBulk);
-
-  // ── Bulk modal buttons ───────────────────────────────────────
-  document.getElementById("bulk-modal-close")
-    .addEventListener("click", skipBulkStudent);
-
-  document.getElementById("bulk-modal-skip")
-    .addEventListener("click", skipBulkStudent);
-
-  document.getElementById("bulk-modal-confirm")
-    .addEventListener("click", confirmBulkStudent);
-
-  // ── Close dropdowns when clicking outside ───────────────────
+  // ── Close dropdowns on outside click ─────────────────────
   document.addEventListener("click", function (e) {
     if (!e.target.closest(".autocomplete-wrap")) {
-      document.querySelectorAll(".autocomplete-list")
-        .forEach(function (d) { d.classList.remove("open"); });
+      document.querySelectorAll(".autocomplete-list").forEach(function (d) {
+        d.classList.remove("open");
+      });
     }
   });
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Record Transaction — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/record.css"/>
 </head>
 <body>
@@ -22,14 +23,12 @@
         <span>Canteen Finance System</span>
       </div>
     </div>
-
     <div class="sidebar-section-label">Main</div>
     <nav class="sidebar-nav">
       <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
       <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
       <a class="nav-item active" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
     </nav>
-
     <div class="sidebar-section-label">Alerts</div>
     <nav class="sidebar-nav">
       <a class="nav-item" href="watchlist.html">
@@ -37,12 +36,10 @@
         <span class="nav-badge" id="watchlist-count">—</span>
       </a>
     </nav>
-
     <div class="sidebar-section-label">Reports</div>
     <nav class="sidebar-nav">
       <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
     </nav>
-
     <div class="sidebar-footer">
       <div class="avatar">A</div>
       <div>
@@ -67,11 +64,11 @@
       <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn active" id="tbtn-payment">💰 Record Payment</button>
-        <button class="tab-btn" id="tbtn-meal">🍽️ Record Meal</button>
-        <button class="tab-btn" id="tbtn-bulk">📋 Bulk Daily Record</button>
+        <button class="tab-btn"        id="tbtn-meal">🍽️ Record Meal</button>
+        <button class="tab-btn"        id="tbtn-bulk">📋 Bulk Daily Record</button>
       </div>
 
-      <!-- ══ PAYMENT TAB ══ -->
+      <!-- ══ TAB 1: RECORD PAYMENT ══════════════════════════ -->
       <div id="tab-payment" class="tab-content active">
         <div style="max-width:520px">
           <div class="card">
@@ -96,12 +93,14 @@
 
               <div class="form-group">
                 <label class="form-label">Amount (KES)</label>
-                <input type="number" id="pay-amount" class="form-control" min="1"/>
+                <input type="number" id="pay-amount" class="form-control"
+                  placeholder="e.g. 500" min="1"/>
               </div>
 
               <div class="form-group">
-                <label class="form-label">Reference</label>
-                <input type="text" id="pay-ref" class="form-control"/>
+                <label class="form-label">Reference / Note (optional)</label>
+                <input type="text" id="pay-ref" class="form-control"
+                  placeholder="e.g. Term 2, M-Pesa ref..."/>
               </div>
 
               <div class="form-group">
@@ -121,7 +120,7 @@
                 </div>
                 <div class="deduction-row">
                   <span>Payment</span>
-                  <span id="pay-prev-amount">—</span>
+                  <span id="pay-prev-amount" class="text-success">—</span>
                 </div>
                 <div class="deduction-row total">
                   <span>Balance After</span>
@@ -129,7 +128,8 @@
                 </div>
               </div>
 
-              <button class="btn btn-primary" id="pay-btn" disabled>
+              <button class="btn btn-primary" id="pay-btn"
+                style="width:100%;justify-content:center;margin-top:16px" disabled>
                 ✅ Confirm Payment
               </button>
 
@@ -138,17 +138,18 @@
         </div>
       </div>
 
-      <!-- ══ MEAL TAB ══ -->
+      <!-- ══ TAB 2: RECORD MEAL ══════════════════════════════ -->
       <div id="tab-meal" class="tab-content">
         <div style="max-width:520px">
           <div class="card">
-            <div class="card-header">🍽️ Record Meal</div>
+            <div class="card-header">🍽️ Record What a Student Ate / Drank</div>
             <div class="card-body">
 
               <div class="form-group">
                 <label class="form-label">Student</label>
                 <div class="autocomplete-wrap">
-                  <input type="text" id="meal-search" class="form-control"/>
+                  <input type="text" id="meal-search" class="form-control"
+                    placeholder="Type student name..." autocomplete="off"/>
                   <div class="autocomplete-list" id="meal-dropdown"></div>
                 </div>
                 <div id="meal-selected" class="student-selected-bar mt-8" style="display:none">
@@ -166,30 +167,39 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Items</label>
-
-                <label><input type="checkbox" id="meal-food"/> Lunch (KES 50)</label>
-                <label><input type="checkbox" id="meal-tea"/> Tea (KES 15)</label>
-                <label><input type="checkbox" id="meal-porridge"/> Porridge (KES 10)</label>
+                <label class="form-label">Items Consumed Today</label>
+                <div class="checkbox-item">
+                  <label><input type="checkbox" id="meal-food"/> 🍽️ Lunch (Food)</label>
+                  <span class="checkbox-price">KES 50</span>
+                </div>
+                <div class="checkbox-item">
+                  <label><input type="checkbox" id="meal-tea"/> ☕ Tea</label>
+                  <span class="checkbox-price">KES 15</span>
+                </div>
+                <div class="checkbox-item">
+                  <label><input type="checkbox" id="meal-porridge"/> 🌾 Porridge</label>
+                  <span class="checkbox-price">KES 10</span>
+                </div>
               </div>
 
               <div class="deduction-summary">
                 <div class="deduction-row">
                   <span>Deduction</span>
-                  <span id="meal-prev-deduction">KES 0</span>
+                  <span id="meal-prev-deduction" class="text-mono">KES 0</span>
                 </div>
                 <div class="deduction-row">
                   <span>Current Balance</span>
-                  <span id="meal-prev-current">—</span>
+                  <span id="meal-prev-current" class="text-mono">—</span>
                 </div>
                 <div class="deduction-row total">
                   <span>Balance After</span>
-                  <span id="meal-prev-after">—</span>
+                  <span id="meal-prev-after" class="text-mono">—</span>
                 </div>
               </div>
 
-              <button class="btn btn-primary" id="meal-btn" disabled>
-                Confirm
+              <button class="btn btn-primary" id="meal-btn"
+                style="width:100%;justify-content:center;margin-top:16px" disabled>
+                Confirm Deduction
               </button>
 
             </div>
@@ -197,23 +207,64 @@
         </div>
       </div>
 
-      <!-- ══ BULK TAB ══ -->
+      <!-- ══ TAB 3: BULK DAILY RECORD ════════════════════════ -->
       <div id="tab-bulk" class="tab-content">
         <div class="card">
           <div class="card-header">
-            📋 Bulk Daily Record
-            <select id="bulk-grade"></select>
-            <input type="date" id="bulk-date"/>
+            📋 Bulk Daily Meal Record
+            <div style="display:flex;gap:10px;align-items:center">
+              <select class="form-control" id="bulk-grade" style="width:auto">
+                <option value="">Select Class</option>
+              </select>
+              <input type="date" id="bulk-date" class="form-control" style="width:auto"/>
+            </div>
           </div>
-
           <div class="card-body">
-            <div id="bulk-rows"></div>
 
-            <div id="bulk-footer" style="display:none">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+              Tick what each student consumed then click
+              <strong style="color:var(--light)">Process All</strong>.
+              Each student is confirmed one by one. 🔥 = frequent eater.
+            </p>
+
+            <!-- Column headers -->
+            <div class="bulk-row header">
+              <div>Student</div>
+              <div>Type</div>
+              <div class="bulk-header-cell">
+                <div class="cell-icon">🍽️</div>
+                <div class="cell-label label-lunch">Lunch</div>
+                <div class="cell-price">KES 50</div>
+              </div>
+              <div class="bulk-header-cell">
+                <div class="cell-icon">☕</div>
+                <div class="cell-label label-tea">Tea</div>
+                <div class="cell-price">KES 15</div>
+              </div>
+              <div class="bulk-header-cell">
+                <div class="cell-icon">🌾</div>
+                <div class="cell-label label-porridge">Porridge</div>
+                <div class="cell-price">KES 10</div>
+              </div>
+              <div style="text-align:right">Cost</div>
+              <div style="text-align:right">Status</div>
+            </div>
+
+            <!-- Student rows injected by JS -->
+            <div id="bulk-rows">
+              <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <p>Select a class to load students</p>
+              </div>
+            </div>
+
+            <!-- Process button -->
+            <div id="bulk-footer" style="display:none;margin-top:20px">
               <button class="btn btn-primary" id="bulk-process-btn">
-                Process All (<span id="pending-count">0</span>)
+                ✅ Process All (<span id="pending-count">0</span> pending)
               </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -222,38 +273,40 @@
   </div>
 </div>
 
-<!-- MODALS -->
+<!-- ── Meal Confirm Modal ── -->
 <div class="modal-overlay" id="meal-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Confirm</div>
-      <button id="meal-modal-cancel">✕</button>
+      <div class="modal-title">🍽️ Confirm Deduction</div>
+      <button class="modal-close" id="meal-modal-cancel">✕</button>
     </div>
     <div id="meal-modal-content"></div>
     <div class="modal-actions">
-      <button id="meal-modal-cancel-2">Cancel</button>
-      <button id="meal-modal-confirm">Confirm</button>
+      <button class="btn btn-secondary" id="meal-modal-cancel-2">✕ Cancel</button>
+      <button class="btn btn-primary"   id="meal-modal-confirm">✅ Yes, Confirm</button>
     </div>
   </div>
 </div>
 
+<!-- ── Bulk Confirm Modal ── -->
 <div class="modal-overlay" id="bulk-modal">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="bulk-modal-title">Confirm</div>
-      <button id="bulk-modal-close">✕</button>
+      <button class="modal-close" id="bulk-modal-close">✕</button>
     </div>
     <div id="bulk-modal-content"></div>
     <div class="modal-actions">
-      <button id="bulk-modal-skip">Skip</button>
-      <button id="bulk-modal-confirm">Confirm</button>
+      <button class="btn btn-secondary" id="bulk-modal-skip">Skip</button>
+      <button class="btn btn-primary"   id="bulk-modal-confirm">✅ Yes, Confirm</button>
     </div>
   </div>
 </div>
 
+<!-- Toast -->
 <div id="toast-container"></div>
 
-<!-- JS -->
+<!-- Scripts at bottom — HTML fully loaded before JS runs -->
 <script src="../js/config.js"></script>
 <script src="../js/sheets.js"></script>
 <script src="../js/animation.js"></script>
@@ -264,5 +317,29 @@
 <script src="../js/record-events.js"></script>
 <script src="../js/sidebar.js"></script>
 
+
+<!-- Bottom Navigation — mobile phones -->
+<nav class="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+</nav>
 </body>
 </html>

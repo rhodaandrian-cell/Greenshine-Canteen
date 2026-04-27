@@ -4,136 +4,116 @@
    ============================================================ */
 
 /* ── Tab content visibility ───────────────────────────────── */
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
+.tab-content         { display: none; }
+.tab-content.active  { display: block; }
 
 /* ── Student selected bar ─────────────────────────────────── */
 .student-selected-bar {
-  background: rgba(139, 58, 42, 0.12);
-  border: 1px solid rgba(139, 58, 42, 0.3);
+  background   : rgba(139,58,42,0.12);
+  border       : 1px solid rgba(139,58,42,0.3);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
+  padding      : 10px 14px;
+  display      : flex;
+  align-items  : center;
   justify-content: space-between;
-  font-size: 14px;
+  font-size    : 14px;
 }
 
-.student-selected-bar .s-name {
-  font-weight: 600;
-  color: var(--light);
-}
-
-.student-selected-bar .s-meta {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
-}
-
-.student-selected-bar .s-bal {
-  font-family: var(--font-mono);
-  font-weight: 600;
-}
+.student-selected-bar .s-name { font-weight: 600; color: var(--light); }
+.student-selected-bar .s-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.student-selected-bar .s-bal  { font-family: var(--font-mono); font-weight: 600; }
 
 /* ── Bulk row grid ────────────────────────────────────────── */
 .bulk-row {
-  display: grid;
+  display              : grid;
   grid-template-columns: 2fr 0.6fr 70px 70px 80px 90px 90px;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  align-items          : center;
+  gap                  : 8px;
+  padding              : 10px 0;
+  border-bottom        : 1px solid var(--border);
+  font-size            : 13px;
+  word-break           : break-word;
 }
 
-.bulk-row.done {
-  opacity: 0.4;
-}
+.bulk-row > div:nth-child(1) { white-space: normal; }
 
-.bulk-row:last-child {
-  border-bottom: none;
-}
+.bulk-row.done { opacity: 0.4; }
+
+.bulk-row:last-child { border-bottom: none; }
 
 /* ── Bulk header row ──────────────────────────────────────── */
 .bulk-row.header {
+  padding-top   : 8px;
   padding-bottom: 12px;
-  border-bottom: 2px solid var(--border);
+  border-bottom : 2px solid var(--border);
+  align-items   : flex-end;
 }
 
 .bulk-header-cell {
-  text-align: center;
-  line-height: 1.5;
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  justify-content: center;
+  text-align    : center;
+  gap           : 2px;
+  line-height   : 1.4;
 }
 
 .bulk-header-cell .cell-icon {
-  font-size: 18px;
+  font-size  : 20px;
+  line-height: 1;
 }
 
 .bulk-header-cell .cell-label {
-  font-size: 12px;
+  font-size  : 11px;
   font-weight: 700;
-  display: block;
-  margin-top: 2px;
+  white-space: nowrap;
 }
 
 .bulk-header-cell .cell-price {
-  font-size: 11px;
-  color: var(--muted);
-  display: block;
+  font-size: 10px;
+  color    : var(--muted);
 }
 
-.label-lunch {
-  color: #2ecc71;
-}
-
-.label-tea {
-  color: #3498db;
-}
-
-.label-porridge {
-  color: #f39c12;
-}
+.label-lunch    { color: #2ecc71; }
+.label-tea      { color: #3498db; }
+.label-porridge { color: #f39c12; }
 
 /* ── Bulk checkboxes ──────────────────────────────────────── */
 .bulk-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent);
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
+  width        : 18px;
+  height       : 18px;
+  accent-color : var(--accent);
+  cursor       : pointer;
+  display      : block;
+  margin       : 0 auto;
 }
 
 /* ── Bulk cost + status ───────────────────────────────────── */
 .bulk-cost {
   font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--warning);
-  text-align: right;
+  font-size  : 13px;
+  color      : var(--warning);
+  text-align : right;
 }
 
 .bulk-status-pending {
-  color: var(--muted);
+  color    : var(--muted);
   font-size: 12px;
 }
 
 .bulk-status-done {
-  color: var(--success);
-  font-size: 12px;
+  color      : var(--success);
+  font-size  : 12px;
   font-weight: 600;
 }
 
 /* ── Confirm items in modal ───────────────────────────────── */
 .confirm-items {
-  display: flex;
-  gap: 6px;
+  display  : flex;
+  gap      : 6px;
   flex-wrap: wrap;
-  margin: 8px 0;
+  margin   : 8px 0;
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
@@ -141,6 +121,6 @@
   .bulk-row {
     grid-template-columns: 1.5fr 0.5fr 50px 50px 60px 70px 60px;
     font-size: 12px;
-    gap: 4px;
+    gap      : 4px;
   }
 }

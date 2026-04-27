@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reports — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
   <link rel="stylesheet" href="../assets/css/reports.css"/>
 </head>
 <body>
@@ -22,14 +23,12 @@
           <span>Canteen Finance System</span>
         </div>
       </div>
-
       <div class="sidebar-section-label">Main</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
         <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
         <a class="nav-item" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
       </nav>
-
       <div class="sidebar-section-label">Alerts</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="watchlist.html">
@@ -37,14 +36,12 @@
           <span class="nav-badge" id="watchlist-count">—</span>
         </a>
       </nav>
-
       <div class="sidebar-section-label">Reports</div>
       <nav class="sidebar-nav">
         <a class="nav-item active" href="reports.html">
           <span class="nav-icon">📋</span> Reports
         </a>
       </nav>
-
       <div class="sidebar-footer">
         <div class="avatar">A</div>
         <div>
@@ -110,5 +107,29 @@
   <script src="../js/reports.js"></script>
   <script src="../js/sidebar.js"></script>
 
+
+<!-- Bottom Navigation — mobile phones -->
+<nav class="bottom-nav">
+    <a href="dashboard.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">📊</span>
+      <span class="bottom-nav-label">Dashboard</span>
+    </a>
+    <a href="students.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Students</span>
+    </a>
+    <a href="record.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">✏️</span>
+      <span class="bottom-nav-label">Record</span>
+    </a>
+    <a href="watchlist.html" class="bottom-nav-item">
+      <span class="bottom-nav-icon">⚠️</span>
+      <span class="bottom-nav-label">Watchlist</span>
+    </a>
+    <a href="reports.html" class="bottom-nav-item active">
+      <span class="bottom-nav-icon">📋</span>
+      <span class="bottom-nav-label">Reports</span>
+    </a>
+</nav>
 </body>
 </html>

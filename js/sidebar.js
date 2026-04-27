@@ -1,73 +1,65 @@
 // ============================================================
 // GREENSHINE ACADEMY — Canteen Finance Management System
-// sidebar.js — Mobile Sidebar Toggle (shared across all pages)
-// Must be loaded at bottom of <body> AFTER sidebar HTML exists
+// sidebar.js — Sidebar toggle (tablet) + active nav state
+// Bottom nav is in HTML directly — no JS needed to build it
 // ============================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
 
-  const sidebar = document.querySelector(".sidebar");
-  const topbar  = document.querySelector(".topbar");
-  if (!sidebar || !topbar) return;
-
-  // ── Inject hamburger into topbar ──────────────────────────
-  const hamburger = document.createElement("button");
-  hamburger.className = "hamburger";
-  hamburger.id = "hamburger";
-  hamburger.setAttribute("aria-label", "Toggle menu");
-  hamburger.innerHTML = `<span></span><span></span><span></span>`;
-  hamburger.addEventListener("click", toggleSidebar);
-  topbar.insertBefore(hamburger, topbar.firstChild);
-
-  // ── Inject overlay ────────────────────────────────────────
-  const overlay = document.createElement("div");
-  overlay.className = "sidebar-overlay";
-  overlay.id = "sidebar-overlay";
-  overlay.addEventListener("click", closeSidebar);
-  document.body.appendChild(overlay);
-
-  // ── Close sidebar on nav link click (mobile) ──────────────
-  document.querySelectorAll(".nav-item").forEach(item => {
-    item.addEventListener("click", () => {
-      if (window.innerWidth <= 900) closeSidebar();
-    });
-  });
-
-  // ── Close on resize to desktop ────────────────────────────
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) closeSidebar();
+  buildHamburger();
+  buildOverlay();
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 1024) closeSidebar();
   });
 
 });
 
+// ── Hamburger button for tablet ───────────────────────────────
+function buildHamburger() {
+  var topbar = document.querySelector(".topbar");
+  if (!topbar) return;
+
+  var btn = document.createElement("button");
+  btn.className = "hamburger";
+  btn.id        = "hamburger";
+  btn.setAttribute("aria-label", "Toggle menu");
+  btn.innerHTML = "<span></span><span></span><span></span>";
+  btn.addEventListener("click", toggleSidebar);
+  topbar.insertBefore(btn, topbar.firstChild);
+}
+
+// ── Dark overlay behind sidebar ───────────────────────────────
+function buildOverlay() {
+  var overlay       = document.createElement("div");
+  overlay.className = "sidebar-overlay";
+  overlay.id        = "sidebar-overlay";
+  overlay.addEventListener("click", closeSidebar);
+  document.body.appendChild(overlay);
+}
+
+// ── Toggle ────────────────────────────────────────────────────
 function toggleSidebar() {
-  const sidebar = document.querySelector(".sidebar");
-  const overlay = document.getElementById("sidebar-overlay");
-  const hamburger = document.getElementById("hamburger");
-
+  var sidebar = document.querySelector(".sidebar");
   if (!sidebar) return;
+  sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+}
 
-  const isOpen = sidebar.classList.contains("open");
-
-  if (isOpen) {
-    closeSidebar();
-  } else {
-    sidebar.classList.add("open");
-    if (overlay) overlay.classList.add("open");
-    if (hamburger) hamburger.classList.add("open");
-    document.body.style.overflow = "hidden";
-  }
+function openSidebar() {
+  var sidebar   = document.querySelector(".sidebar");
+  var overlay   = document.getElementById("sidebar-overlay");
+  var hamburger = document.getElementById("hamburger");
+  if (sidebar)   sidebar.classList.add("open");
+  if (overlay)   overlay.classList.add("open");
+  if (hamburger) hamburger.classList.add("open");
+  document.body.style.overflow = "hidden";
 }
 
 function closeSidebar() {
-  const sidebar = document.querySelector(".sidebar");
-  const overlay = document.getElementById("sidebar-overlay");
-  const hamburger = document.getElementById("hamburger");
-
-  if (!sidebar) return;
-
-  sidebar.classList.remove("open");
-  if (overlay) overlay.classList.remove("open");
+  var sidebar   = document.querySelector(".sidebar");
+  var overlay   = document.getElementById("sidebar-overlay");
+  var hamburger = document.getElementById("hamburger");
+  if (sidebar)   sidebar.classList.remove("open");
+  if (overlay)   overlay.classList.remove("open");
   if (hamburger) hamburger.classList.remove("open");
   document.body.style.overflow = "";
 }
