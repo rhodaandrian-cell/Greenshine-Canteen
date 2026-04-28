@@ -331,9 +331,58 @@ function showBulkModal() {
 
 // ── Confirm and submit current student ───────────────────────
 async function confirmBulkStudent() {
-  var entry = bulkQueue[bulkIndex];
-  var s     = entry.s;
-  var idx   = entry.idx;
+  var entry   = bulkQueue[bulkIndex];
+  var s       = entry.s;
+  var idx     = entry.idx;
+
+  // ── Disable both modal buttons immediately ────────────────
+  // Prevents double-clicking while saving to Google Sheet
+  var confirmBtn = document.getElementById("bulk-modal-confirm");
+  var skipBtn    = document.getElementById("bulk-modal-skip");
+  var closeBtn   = document.getElementById("bulk-modal-close");
+
+  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = "Recording..."; }
+  if (skipBtn)    skipBtn.disabled    = true;
+  if (closeBtn)   closeBtn.disabled   = true;
+
+  // ── Show saving message with countdown ────────────────────
+  var contentEl = document.getElementById("bulk-modal-content");
+  var items = [
+    entry.food     ? "Lunch"    : "",
+    entry.tea      ? "Tea"      : "",
+    entry.porridge ? "Porridge" : ""
+  ].filter(Boolean).join(", ");
+
+  // Start countdown display
+  var count    = 1;
+  var countEl  = null;
+
+  if (contentEl) {
+    contentEl.innerHTML =
+      '<div style="text-align:center;padding:20px 0">' +
+        '<div class="spinner" style="width:32px;height:32px;border-width:3px;' +
+          'margin:0 auto 16px"></div>' +
+        '<div style="font-size:14px;font-weight:600;color:var(--light);margin-bottom:8px">' +
+          'Recording ' + s.name + '\'s meal...' +
+        '</div>' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:16px">' +
+          items +
+        '</div>' +
+        '<div id="bulk-countdown" style="font-size:28px;font-weight:700;' +
+          'color:var(--accent)">1</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:6px">' +
+          'Please wait...' +
+        '</div>' +
+      '</div>';
+
+    countEl = document.getElementById("bulk-countdown");
+  }
+
+  // Count up every second while saving
+  var countInterval = setInterval(function () {
+    count++;
+    if (countEl) countEl.textContent = count;
+  }, 1000);
 
   try {
     var res = await Sheets.recordMeal({
@@ -346,6 +395,23 @@ async function confirmBulkStudent() {
       date       : document.getElementById("bulk-date").value || Sheets.today(),
       recordedBy : ADMIN_NAME
     });
+
+    // Stop countdown
+    clearInterval(countInterval);
+
+    // Show success briefly before moving to next
+    if (contentEl) {
+      contentEl.innerHTML =
+        '<div style="text-align:center;padding:20px 0">' +
+          '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
+          '<div style="font-size:15px;font-weight:600;color:var(--success)">' +
+            s.name + ' recorded!' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-top:6px">' +
+            'KES ' + entry.cost + ' deducted · ' + items +
+          '</div>' +
+        '</div>';
+    }
 
     // Mark row as done — desktop + mobile
     var statusEl = document.getElementById("bulk-status-" + idx);
@@ -364,13 +430,45 @@ async function confirmBulkStudent() {
     });
     if (found) { found.balance = res.newBalance; found.type = res.type; }
 
-  } catch (err) {
-    showToast("Error for " + s.name + ": " + err.message, "error");
-  }
+    // Wait 1 second showing success then move to next
+    setTimeout(function () {
+      bulkIndex++;
+      updatePendingCount();
 
-  bulkIndex++;
-  updatePendingCount();
-  showBulkModal();
+      // Re-enable buttons for next student
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = "✅ Yes, Confirm"; }
+      if (skipBtn)    skipBtn.disabled    = false;
+      if (closeBtn)   closeBtn.disabled   = false;
+
+      showBulkModal();
+    }, 1000);
+
+  } catch (err) {
+    clearInterval(countInterval);
+    showToast("Error for " + s.name + ": " + err.message, "error");
+
+    // Re-enable buttons so admin can try again or skip
+    if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = "✅ Yes, Confirm"; }
+    if (skipBtn)    skipBtn.disabled    = false;
+    if (closeBtn)   closeBtn.disabled   = false;
+
+    // Show error in modal
+    if (contentEl) {
+      contentEl.innerHTML =
+        '<div style="text-align:center;padding:20px 0">' +
+          '<div style="font-size:48px;margin-bottom:12px">❌</div>' +
+          '<div style="font-size:14px;color:var(--danger)">' +
+            'Failed to record ' + s.name + '\'s meal.' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:8px">' +
+            err.message +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-top:12px">' +
+            'You can try again or skip to the next student.' +
+          '</div>' +
+        '</div>';
+    }
+  }
 }
 
 // ── Skip current student ──────────────────────────────────────

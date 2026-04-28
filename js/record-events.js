@@ -6,56 +6,42 @@
 
 window.addEventListener("load", function () {
 
-  // Helper — safely attach listener, skip if element missing
+  // Safe attach — skips silently if element missing
   function on(id, event, fn) {
     var el = document.getElementById(id);
     if (el) el.addEventListener(event, fn);
   }
 
-  // ── Tab buttons ───────────────────────────────────────────
+  // ── Tabs ──────────────────────────────────────────────────
   on("tbtn-payment", "click", function () { switchTab("payment"); });
   on("tbtn-meal",    "click", function () { switchTab("meal");    });
   on("tbtn-bulk",    "click", function () { switchTab("bulk");    });
 
-  // ── Payment search ────────────────────────────────────────
-  on("pay-search", "input", function () {
-    searchStudents("pay", this.value);
-  });
+  // ── Payment ───────────────────────────────────────────────
+  on("pay-search", "input",  function () { searchStudents("pay", this.value); });
+  on("pay-amount", "input",  function () { updatePayPreview(); });
+  on("pay-btn",    "click",  function () { submitPayment(); });
 
-  // ── Payment amount — live preview ─────────────────────────
-  on("pay-amount", "input", updatePayPreview);
-
-  // ── Payment confirm ───────────────────────────────────────
-  on("pay-btn", "click", submitPayment);
-
-  // ── Meal search ───────────────────────────────────────────
-  on("meal-search", "input", function () {
-    searchStudents("meal", this.value);
-  });
-
-  // ── Meal checkboxes — live preview ────────────────────────
-  on("meal-food",     "change", updateMealPreview);
-  on("meal-tea",      "change", updateMealPreview);
-  on("meal-porridge", "change", updateMealPreview);
-
-  // ── Meal confirm button ───────────────────────────────────
-  on("meal-btn", "click", showMealConfirm);
+  // ── Meal ──────────────────────────────────────────────────
+  on("meal-search",   "input",  function () { searchStudents("meal", this.value); });
+  on("meal-food",     "change", function () { updateMealPreview(); });
+  on("meal-tea",      "change", function () { updateMealPreview(); });
+  on("meal-porridge", "change", function () { updateMealPreview(); });
+  on("meal-btn",      "click",  function () { showMealConfirm(); });
 
   // ── Meal modal ────────────────────────────────────────────
-  on("meal-modal-cancel",   "click", closeMealModal);
-  on("meal-modal-cancel-2", "click", closeMealModal);
-  on("meal-modal-confirm",  "click", submitMeal);
+  on("meal-modal-cancel",   "click", function () { closeMealModal(); });
+  on("meal-modal-cancel-2", "click", function () { closeMealModal(); });
+  on("meal-modal-confirm",  "click", function () { submitMeal(); });
 
-  // ── Bulk class dropdown ───────────────────────────────────
-  on("bulk-grade", "change", loadBulkClass);
-
-  // ── Bulk process button ───────────────────────────────────
-  on("bulk-process-btn", "click", processBulk);
+  // ── Bulk ──────────────────────────────────────────────────
+  on("bulk-grade",       "change", function () { loadBulkClass(); });
+  on("bulk-process-btn", "click",  function () { processBulk(); });
 
   // ── Bulk modal ────────────────────────────────────────────
-  on("bulk-modal-close",   "click", skipBulkStudent);
-  on("bulk-modal-skip",    "click", skipBulkStudent);
-  on("bulk-modal-confirm", "click", confirmBulkStudent);
+  on("bulk-modal-close",   "click", function () { skipBulkStudent(); });
+  on("bulk-modal-skip",    "click", function () { skipBulkStudent(); });
+  on("bulk-modal-confirm", "click", function () { confirmBulkStudent(); });
 
   // ── Close dropdowns on outside click ─────────────────────
   document.addEventListener("click", function (e) {
