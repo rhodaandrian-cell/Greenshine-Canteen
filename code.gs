@@ -113,7 +113,8 @@ function handleRequest(e) {
       case "recordMeal":      result = recordMeal(params);            break;
       case "recordBulkMeals": result = recordBulkMeals(params);       break;
       case "getWatchlist":    result = getWatchlist();                break;
-      case "getReports":      result = getReports(params);            break;
+      case "getReports":         result = getReports(params);             break;
+      case "checkTodayMeals":   result = checkTodayMeals(params);        break;
       default: result = { error: "Unknown action: " + action };
     }
   } catch (err) {
@@ -660,4 +661,33 @@ function getWeekTransactions(transactions, dateStr) {
   var monStr = formatDate(mon);
   var friStr = formatDate(fri);
   return transactions.filter(function(t) { return t.date >= monStr && t.date <= friStr; });
+}
+
+// ============================================================
+// CHECK TODAY MEALS
+// Returns what a student has already eaten today
+// ============================================================
+function checkTodayMeals(params) {
+  var admNo  = params.admNo;
+  var date   = params.date || formatDate(new Date());
+  var sheet  = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+  var data   = sheet.getDataRange().getValues();
+
+  var todayItems = { food: false, tea: false, porridge: false, count: 0 };
+
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    if (String(row[2]).trim() !== String(admNo).trim()) continue;
+    if (row[1] !== "MEAL") continue;
+    if (formatDate(row[0]) !== date) continue;
+
+    // Found a meal record for this student today
+    if (row[6] === "YES") todayItems.food     = true;
+    if (row[7] === "YES") todayItems.tea      = true;
+    if (row[8] === "YES") todayItems.porridge = true;
+    todayItems.count++;
+  }
+
+  return { success: true, admNo: admNo, date: date, todayItems: todayItems };
 }

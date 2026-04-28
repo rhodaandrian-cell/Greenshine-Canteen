@@ -96,6 +96,7 @@ function switchTab(tab) {
 }
 
 // ── Autocomplete — works for both pay and meal modes ──────────
+// Called with mode = "pay" or "meal"
 function searchStudents(mode, query) {
   var dropdown = document.getElementById(mode + "-dropdown");
   if (!dropdown) return;
@@ -115,15 +116,17 @@ function searchStudents(mode, query) {
 
   if (matches.length === 0) {
     dropdown.innerHTML =
-      '<div class="autocomplete-item" style="color:var(--muted);pointer-events:none;font-style:italic">' +
-      'No student found for "' + query + '"' +
+      '<div class="autocomplete-item" ' +
+        'style="color:var(--muted);pointer-events:none;font-style:italic">' +
+        'No student found for "' + query + '"' +
       '</div>';
     dropdown.classList.add("open");
     return;
   }
 
+  // Escape special regex chars then bold matching letters
   var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  var re      = new RegExp("(" + escaped + ")", "gi");
+  var re       = new RegExp("(" + escaped + ")", "gi");
 
   dropdown.innerHTML = matches.map(function (s) {
     var bal    = s.balance || 0;
@@ -132,12 +135,14 @@ function searchStudents(mode, query) {
     var name   = s.name.replace(re,
       "<strong style='color:var(--light)'>$1</strong>"
     );
-
     return (
-      '<div class="autocomplete-item" onclick="selectStudent(\'' + mode + '\',' + s.admNo + ')">' +
+      '<div class="autocomplete-item" ' +
+        'onclick="selectStudent(\'' + mode + '\',' + s.admNo + ')">' +
         '<div class="item-name">' +
           name +
-          '<span style="font-size:11px;color:var(--muted-2);margin-left:6px">#' + s.admNo + '</span>' +
+          '<span style="font-size:11px;color:var(--muted-2);margin-left:6px">' +
+            '#' + s.admNo +
+          '</span>' +
         '</div>' +
         '<div class="item-meta">' +
           s.displayGrade +
@@ -163,22 +168,20 @@ function selectStudent(mode, admNo) {
   if (dropdown) dropdown.classList.remove("open");
   if (searchEl) searchEl.value = s.name;
 
+  // Route to the right tab handler
   if (mode === "pay")  selectPayStudent(s);
   if (mode === "meal") selectMealStudent(s);
 }
 
 // ── Shared toast notification ─────────────────────────────────
 function showToast(msg, type) {
-  type = type || "success";
-
+  type      = type || "success";
   var icons = { success:"✅", error:"❌", warning:"⚠️" };
   var el    = document.createElement("div");
-
   el.className = "toast " + type;
   el.innerHTML =
     "<span>" + (icons[type] || "ℹ️") + "</span>" +
     "<span>" + msg + "</span>";
-
   document.getElementById("toast-container").appendChild(el);
   setTimeout(function () { el.remove(); }, 4000);
 }
@@ -187,19 +190,62 @@ function showToast(msg, type) {
 function balanceWarningHtml(bal, cost) {
   if (bal > 0 && bal < cost) {
     return (
-      '<div style="background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.3);border-radius:6px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--warning)">' +
-      '⚠️ Balance (' + Sheets.formatBalance(bal) + ') is less than meal cost (KES ' + cost + '). Student will go into debt.' +
-      '</div>'
+      '<div style="background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.3);' +
+      'border-radius:6px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--warning)">' +
+      '⚠️ Balance (' + Sheets.formatBalance(bal) + ') is less than meal cost (KES ' + cost + '). ' +
+      'Student will go into debt.</div>'
     );
   }
-
   if (bal <= 0) {
     return (
-      '<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:6px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--danger)">' +
-      '❌ Student already in debt (' + Sheets.formatBalance(bal) + '). Meal still recorded per school policy.' +
-      '</div>'
+      '<div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);' +
+      'border-radius:6px;padding:10px 12px;margin-top:10px;font-size:13px;color:var(--danger)">' +
+      '❌ Student already in debt (' + Sheets.formatBalance(bal) + '). ' +
+      'Meal still recorded per school policy.</div>'
     );
   }
-
   return "";
+}
+
+// ── Check for duplicate meals today ──────────────────────────
+// Returns warning HTML if student already ate any of the same
+// items today, otherwise returns empty string
+async function buildDuplicateWarning(admNo, name, date, food, tea, porridge) {
+  try {
+    var res      = await Sheets.checkTodayMeals(admNo, date);
+    var today    = res.todayItems || {};
+    var dupes    = [];
+
+    if (food     && today.food)     dupes.push("Lunch");
+    if (tea      && today.tea)      dupes.push("Tea");
+    if (porridge && today.porridge) dupes.push("Porridge");
+
+    if (dupes.length === 0) return "";
+
+    var already = [];
+    if (today.food)     already.push("Lunch");
+    if (today.tea)      already.push("Tea");
+    if (today.porridge) already.push("Porridge");
+
+    return (
+      '<div style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.4);' +
+      'border-radius:6px;padding:12px;margin-top:10px;font-size:13px;color:#3498db">' +
+        '<div style="font-weight:600;margin-bottom:6px">' +
+          '⚠️ Already recorded today (' + date + ')' +
+        '</div>' +
+        '<div style="margin-bottom:6px">' +
+          name + ' was already recorded for: <strong>' + already.join(", ") + '</strong>' +
+        '</div>' +
+        '<div>' +
+          'Duplicate items: <strong>' + dupes.join(", ") + '</strong>' +
+        '</div>' +
+        '<div style="margin-top:8px;color:rgba(52,152,219,0.8)">' +
+          'Confirm below only if ' + name.split(" ")[0] + ' genuinely had these again today.' +
+        '</div>' +
+      '</div>'
+    );
+  } catch (err) {
+    // If check fails just proceed without warning
+    return "";
+  }
 }

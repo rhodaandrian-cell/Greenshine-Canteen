@@ -96,6 +96,11 @@ const Sheets = {
     }));
   },
 
+  // ── Check what a student has already eaten today ────────────
+  async checkTodayMeals(admNo, date) {
+    return await this.post("checkTodayMeals", { admNo: admNo, date: date || this.today() });
+  },
+
   // Get students filtered by grade
   async getStudentsByGrade(grade) {
     const students = await this.getStudentsWithBalances();

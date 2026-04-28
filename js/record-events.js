@@ -36,12 +36,12 @@ window.addEventListener("load", function () {
 
   // ── Bulk ──────────────────────────────────────────────────
   on("bulk-grade",       "change", function () { loadBulkClass(); });
-  on("bulk-process-btn", "click",  function () { processBulk(); });
+  on("bulk-process-btn", "click",  async function () { await processBulk(); });
 
   // ── Bulk modal ────────────────────────────────────────────
-  on("bulk-modal-close",   "click", function () { skipBulkStudent(); });
-  on("bulk-modal-skip",    "click", function () { skipBulkStudent(); });
-  on("bulk-modal-confirm", "click", function () { confirmBulkStudent(); });
+  on("bulk-modal-close",   "click", async function () { await skipBulkStudent(); });
+  on("bulk-modal-skip",    "click", async function () { await skipBulkStudent(); });
+  on("bulk-modal-confirm", "click", async function () { await confirmBulkStudent(); });
 
   // ── Close dropdowns on outside click ─────────────────────
   document.addEventListener("click", function (e) {
