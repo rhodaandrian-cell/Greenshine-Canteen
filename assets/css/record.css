@@ -128,3 +128,64 @@
 /* ── Mobile card elements — hidden on desktop ─────────────── */
 .bulk-checks      { display: none; }
 .bulk-footer-row  { display: none; }
+
+/* ── Already eaten items ──────────────────────────────────── */
+.already-eaten {
+  opacity       : 0.5;
+  pointer-events: none;
+  border-color  : rgba(46,204,113,0.3) !important;
+  background    : rgba(46,204,113,0.05) !important;
+}
+
+/* ── Locked meal checkbox — already recorded, cannot change ── */
+input[type="checkbox"].locked-meal {
+  opacity       : 0.45;
+  cursor        : not-allowed;
+  accent-color  : var(--success);
+  filter        : blur(0.4px);
+  pointer-events: none;
+}
+
+/* Parent label also not-allowed */
+input[type="checkbox"].locked-meal + span,
+input[type="checkbox"].locked-meal ~ span {
+  opacity: 0.5;
+  cursor : not-allowed;
+}
+
+/* Locked check items on mobile */
+.bulk-check-item:has(input.locked-meal) {
+  opacity       : 0.45;
+  cursor        : not-allowed;
+  border-color  : rgba(46,204,113,0.3);
+  background    : rgba(46,204,113,0.08);
+  pointer-events: none;
+}
+
+/* ── Locked checkboxes — already recorded, cannot change ─── */
+.locked-check {
+  opacity       : 0.4;
+  cursor        : not-allowed !important;
+  accent-color  : var(--success) !important;
+  filter        : blur(0.5px);
+  pointer-events: none;
+}
+
+/* Parent cell blurred when locked */
+.bulk-row input.locked-check + * { opacity: 0.4; }
+
+/* Mobile card — locked item */
+.bulk-check-item:has(.locked-check) {
+  opacity       : 0.5;
+  cursor        : not-allowed;
+  border-color  : rgba(46,204,113,0.3) !important;
+  background    : rgba(46,204,113,0.05) !important;
+  pointer-events: none;
+}
+
+/* Partial status badge */
+.bulk-status-partial {
+  color    : var(--info);
+  font-size: 12px;
+  font-weight: 500;
+}

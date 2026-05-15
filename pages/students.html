@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Students — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
@@ -39,6 +40,7 @@
       <div class="sidebar-section-label">Reports</div>
       <nav class="sidebar-nav">
         <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
+        <a class="nav-item" href="weekly-report.html"><span class="nav-icon">📅</span> Weekly Report</a>
       </nav>
       <div class="sidebar-footer">
         <div class="avatar">A</div>
@@ -164,13 +166,19 @@
       <span class="bottom-nav-icon">📋</span>
       <span class="bottom-nav-label">Reports</span>
     </a>
+    <a href="weekly-report.html" class="bottom-nav-item" id="bnav-weekly">
+      <span class="bottom-nav-icon">📅</span>
+      <span class="bottom-nav-label">Weekly</span>
+    </a>
   </nav>
 
   <div id="toast-container"></div>
 
   <script src="../js/config.js"></script>
+<script src="../js/loading.js"></script>
   <script src="../js/animation.js"></script>
   <script src="../js/sheets.js"></script>
+<script src="../js/pdf.js"></script>
   <script src="../js/students.js"></script>
   <script src="../js/sidebar.js"></script>
 

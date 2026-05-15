@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>"/>
+  <title>Weekly Report — Greenshine Canteen</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
+  <link rel="stylesheet" href="../assets/css/weekly-report.css"/>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+
+<!-- Full page loading overlay -->
+<div id="loading-overlay">
+  <div class="spinner" style="width:32px;height:32px;border-width:3px"></div>
+  <span>Loading weekly report...</span>
+</div>
+
+<!-- Main page — hidden until data loads -->
+<div class="app-layout" id="report-page" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="avatar">G</div>
+      <div class="sidebar-logo-text">
+        <h1>Greenshine Academy</h1>
+        <span>Canteen Finance System</span>
+      </div>
+    </div>
+    <div class="sidebar-section-label">Main</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+      <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
+      <a class="nav-item" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
+    </nav>
+    <div class="sidebar-section-label">Alerts</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="watchlist.html">
+        <span class="nav-icon">⚠️</span> Watchlist
+        <span class="nav-badge" id="watchlist-count">—</span>
+      </a>
+    </nav>
+    <div class="sidebar-section-label">Reports</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
+      <a class="nav-item active" href="weekly-report.html"><span class="nav-icon">📅</span> Weekly Report</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">A</div>
+      <div>
+        <div style="font-size:13px;color:var(--light)">Tr Jedida</div>
+        <div style="font-size:11px;color:var(--muted)">Administrator</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">📅 Weekly Meal Report</div>
+        <div class="topbar-date" id="report-week-label">—</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="generateWeeklyPDF()">📄 Download PDF</button>
+        <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Week navigation -->
+      <div class="week-nav">
+        <button class="btn btn-secondary btn-sm" onclick="changeWeek(-1)">← Previous Week</button>
+        <span class="week-label" id="week-display">—</span>
+        <button class="btn btn-secondary btn-sm" id="next-week-btn" onclick="changeWeek(1)">Next Week →</button>
+        <button class="btn btn-secondary btn-sm" onclick="generateReport()">🔄 Refresh</button>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-label">Students Ate</div>
+          <div class="stat-value" id="sum-students">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Meals</div>
+          <div class="stat-value" id="sum-meals">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Deducted</div>
+          <div class="stat-value warning" id="sum-deducted">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Flagged ⭐</div>
+          <div class="stat-value warning" id="sum-flagged">—</div>
+        </div>
+      </div>
+
+      <!-- Weekly meals table -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          📋 Meal Record —
+          <span id="table-week-label">—</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead id="week-thead"></thead>
+            <tbody id="week-tbody">
+              <tr><td colspan="10">
+                <div class="loading">
+                  <div class="spinner"></div> Loading...
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Balance discrepancy notes -->
+      <div class="card">
+        <div class="card-header">⭐ Balance Discrepancy Notes</div>
+        <div class="card-body" id="flag-notes">
+          <div class="loading">
+            <div class="spinner"></div> Checking balances...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav" id="bottom-nav">
+  <a href="dashboard.html" class="bottom-nav-item" id="bnav-dashboard">
+    <span class="bottom-nav-icon">📊</span>
+    <span class="bottom-nav-label">Dashboard</span>
+  </a>
+  <a href="students.html" class="bottom-nav-item" id="bnav-students">
+    <span class="bottom-nav-icon">👤</span>
+    <span class="bottom-nav-label">Students</span>
+  </a>
+  <a href="record.html" class="bottom-nav-item" id="bnav-record">
+    <span class="bottom-nav-icon">✏️</span>
+    <span class="bottom-nav-label">Record</span>
+  </a>
+  <a href="watchlist.html" class="bottom-nav-item" id="bnav-watchlist">
+    <span class="bottom-nav-icon">⚠️</span>
+    <span class="bottom-nav-label">Watchlist</span>
+  </a>
+  <a href="reports.html" class="bottom-nav-item" id="bnav-reports">
+    <span class="bottom-nav-icon">📋</span>
+    <span class="bottom-nav-label">Reports</span>
+  </a>
+  <a href="weekly-report.html" class="bottom-nav-item active" id="bnav-weekly">
+    <span class="bottom-nav-icon">📅</span>
+    <span class="bottom-nav-label">Weekly</span>
+  </a>
+</nav>
+
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="../js/config.js"></script>
+<script src="../js/loading.js"></script>
+<script src="../js/sheets.js"></script>
+<script src="../js/animation.js"></script>
+<script src="../js/pdf.js"></script>
+<script src="../js/weekly-report.js"></script>
+<script src="../js/sidebar.js"></script>
+
+</body>
+</html>

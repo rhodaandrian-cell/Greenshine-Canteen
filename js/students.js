@@ -194,7 +194,7 @@ async function openDetail(admNo) {
       📅 This Week
     </div>
     <div id="week-calendar">
-      <div class="loading"><div class="spinner"></div></div>
+      <div class="loading"><div class="spinner"></div> Loading calendar...</div>
     </div>
 
     <div style="font-size:13px;font-weight:600;color:var(--muted);margin:20px 0 12px">

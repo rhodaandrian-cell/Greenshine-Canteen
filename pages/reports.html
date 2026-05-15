@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reports — Greenshine Canteen</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
@@ -60,7 +61,13 @@
           <div class="topbar-date" id="today-date">—</div>
         </div>
         <div class="topbar-actions">
+          <a href="weekly-report.html" class="btn btn-secondary btn-sm">📅 Weekly Report</a>
+          <button class="btn btn-secondary btn-sm" onclick="PDF.allBalancesReport()">📄 All Balances PDF</button>
+          <button class="btn btn-danger btn-sm" onclick="PDF.debtReport()">⚠️ Debt Report PDF</button>
           <button class="print-btn" onclick="printReport()">🖨️ Print</button>
+          <a href="weekly-report.html" class="btn btn-secondary btn-sm">📅 Weekly Report</a>
+          <button class="btn btn-secondary btn-sm" onclick="PDF.allBalancesReport()">📄 All Balances PDF</button>
+          <button class="btn btn-danger btn-sm" onclick="PDF.debtReport()">⚠️ Debt Report PDF</button>
           <a href="debt-report.html" class="btn btn-danger btn-sm">⬇ Debt Report PDF</a>
         </div>
       </div>
@@ -102,8 +109,10 @@
 
   <!-- Scripts -->
   <script src="../js/config.js"></script>
+<script src="../js/loading.js"></script>
   <script src="../js/animation.js"></script>
   <script src="../js/sheets.js"></script>
+<script src="../js/pdf.js"></script>
   <script src="../js/reports.js"></script>
   <script src="../js/sidebar.js"></script>
 
@@ -131,5 +140,30 @@
       <span class="bottom-nav-label">Reports</span>
     </a>
 </nav>
+<script>
+// Auto-popup on Monday morning — remind admin to check last week
+window.addEventListener("load", function () {
+  var today = new Date();
+  var isMonday = today.getDay() === 1;
+  var hour     = today.getHours();
+
+  if (isMonday && hour < 12) {
+    var lastSeen = localStorage.getItem("weekly-popup-seen");
+    var thisWeek = today.toISOString().slice(0, 10);
+
+    if (lastSeen !== thisWeek) {
+      setTimeout(function () {
+        var go = confirm(
+          "Good morning! \n\n" +
+          "It\'s Monday — would you like to view last week\'s meal summary report?\n\n" +
+          "Click OK to open the Weekly Report."
+        );
+        if (go) window.location.href = "weekly-report.html";
+        localStorage.setItem("weekly-popup-seen", thisWeek);
+      }, 1500);
+    }
+  }
+});
+</script>
 </body>
 </html>

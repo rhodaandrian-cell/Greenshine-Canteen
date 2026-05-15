@@ -1,40 +1,71 @@
 // ============================================================
 // GREENSHINE ACADEMY — Canteen Finance Management System
 // dailyrecord.js — Bulk Daily Record Tab Logic
-// Depends on: record-init.js (allStudents, allTxHistory, ADMIN_NAME, showToast, balanceWarningHtml, buildDuplicateWarning)
 // ============================================================
 
 var bulkStudents = [];
 var bulkQueue    = [];
 var bulkIndex    = 0;
 
-// ── Populate class dropdown on load ──────────────────────────
+// ── Populate class dropdown ───────────────────────────────────
 document.addEventListener("DOMContentLoaded", function () {
   var sel = document.getElementById("bulk-grade");
   if (!sel) return;
   while (sel.options.length > 1) sel.remove(1);
   GREENSHINE.CLASSES.forEach(function (c) {
-    var opt         = document.createElement("option");
-    opt.value       = c.value;
+    var opt = document.createElement("option");
+    opt.value = c.value;
     opt.textContent = c.label;
     sel.appendChild(opt);
   });
 });
 
-// ── Load students for selected class ─────────────────────────
-function loadBulkClass() {
+// ── Countdown before loading ─────────────────────────────────
+function bulkCountdown(container, grade, date) {
+  return new Promise(function (resolve) {
+    var count = 3;
+    container.innerHTML =
+      '<div style="text-align:center;padding:40px 20px">' +
+        '<div id="bulk-cd-number" style="font-size:72px;font-weight:700;color:var(--accent);line-height:1;margin-bottom:12px">' + count + '</div>' +
+        '<div style="font-size:14px;color:var(--muted)">Loading ' + grade + ' for ' + date + '...</div>' +
+      '</div>';
+
+    var timer = setInterval(function () {
+      count--;
+      var numEl = document.getElementById("bulk-cd-number");
+      if (numEl) {
+        if (count > 0) {
+          numEl.textContent = count;
+          numEl.style.color = count === 2 ? "var(--warning)" : "var(--success)";
+        } else {
+          numEl.textContent = "🚀";
+        }
+      }
+      if (count <= 0) {
+        clearInterval(timer);
+        setTimeout(resolve, 300);
+      }
+    }, 700);
+  });
+}
+
+// ── Load class students + existing records for selected date ──
+async function loadBulkClass() {
   var grade     = document.getElementById("bulk-grade").value;
+  var date      = document.getElementById("bulk-date").value || Sheets.today();
   var container = document.getElementById("bulk-rows");
   var footer    = document.getElementById("bulk-footer");
 
   if (!grade) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Select a class to load students</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>Select a class</p></div>';
     if (footer) footer.style.display = "none";
     return;
   }
 
-  container.innerHTML = '<div class="loading"><div class="spinner"></div> Loading ' + grade + '...</div>';
+  // ── Countdown before loading ──────────────────────────────
+  await bulkCountdown(container, grade, date);
 
+  // Filter students by class
   bulkStudents = allStudents.filter(function (s) {
     return s.displayGrade === grade;
   });
@@ -45,18 +76,33 @@ function loadBulkClass() {
     return;
   }
 
-  // Sort: most meals first
+  // Sort by ADM number
   bulkStudents.sort(function (a, b) {
-    return (allTxHistory[b.admNo] || 0) - (allTxHistory[a.admNo] || 0);
+    return Number(a.admNo) - Number(b.admNo);
   });
 
-  renderBulkRows();
+  // Load what was already recorded on this date
+  var recorded = {};
+  try {
+    var txRes = await Sheets.getTransactions();
+    (txRes.transactions || []).forEach(function (tx) {
+      if (tx.type !== "MEAL" || tx.date !== date) return;
+      var key = String(tx.admNo);
+      if (!recorded[key]) recorded[key] = { food: false, tea: false, porridge: false };
+      if (tx.food     === "YES") recorded[key].food     = true;
+      if (tx.tea      === "YES") recorded[key].tea      = true;
+      if (tx.porridge === "YES") recorded[key].porridge = true;
+    });
+  } catch (e) { /* proceed without pre-fill */ }
+
+  renderBulkRows(recorded);
   if (footer) footer.style.display = "block";
   updatePendingCount();
 }
 
-// ── Render student rows ───────────────────────────────────────
-function renderBulkRows() {
+// ── Render rows ───────────────────────────────────────────────
+function renderBulkRows(recorded) {
+  recorded = recorded || {};
   var container = document.getElementById("bulk-rows");
   if (!container) return;
 
@@ -68,8 +114,28 @@ function renderBulkRows() {
     var flame  = meals > 10 ? "🔥 " : "";
     var balCls = bal >= 0 ? "text-success" : "text-danger";
 
+    // What did this student already eat on selected date?
+    var ate    = recorded[String(s.admNo)] || { food: false, tea: false, porridge: false };
+
+    // Build checkbox — locked+blurred if already eaten, open if not
+    function cb(cls, isEaten) {
+      if (isEaten) {
+        return '<input type="checkbox" class="' + cls + '" data-idx="' + idx + '"' +
+               ' checked disabled style="opacity:0.35;cursor:not-allowed;accent-color:var(--success)"/>';
+      }
+      return '<input type="checkbox" class="' + cls + '" data-idx="' + idx + '"/>';
+    }
+
+    var initCost = (ate.food ? 50 : 0) + (ate.tea ? 15 : 0) + (ate.porridge ? 10 : 0);
+    var status   = ate.food && ate.tea && ate.porridge
+      ? '<span class="bulk-status-done">Done ✅</span>'
+      : initCost > 0
+        ? '<span class="bulk-status-partial">Partial</span>'
+        : '<span class="bulk-status-pending">Pending</span>';
+
     html +=
-      '<div class="bulk-row" id="bulk-row-' + idx + '">' +
+      '<div class="bulk-row' + (ate.food && ate.tea && ate.porridge ? ' done' : '') + '" id="bulk-row-' + idx + '">' +
+
         '<div>' +
           '<div class="bulk-student-name">' + flame + s.name + '</div>' +
           '<div class="bulk-student-meta">' +
@@ -77,122 +143,135 @@ function renderBulkRows() {
             (meals > 0 ? ' · ' + meals + ' meal' + (meals !== 1 ? 's' : '') : ' · no meals yet') +
           '</div>' +
         '</div>' +
+
         '<div class="bulk-type-badge">' +
           '<span class="badge" style="background:' + t.color + '20;color:' + t.color + ';border:1px solid ' + t.color + '40;font-size:11px">' + s.type + '</span>' +
         '</div>' +
-        '<div style="text-align:center"><input type="checkbox" class="bulk-food" data-idx="' + idx + '"/></div>' +
-        '<div style="text-align:center"><input type="checkbox" class="bulk-tea" data-idx="' + idx + '"/></div>' +
-        '<div style="text-align:center"><input type="checkbox" class="bulk-porridge" data-idx="' + idx + '"/></div>' +
-        '<div class="bulk-cost" id="bulk-cost-' + idx + '">KES 0</div>' +
-        '<div style="text-align:right"><span class="bulk-status-pending" id="bulk-status-' + idx + '">Pending</span></div>' +
+
+        '<div style="text-align:center">' + cb("bulk-food",     ate.food)     + '</div>' +
+        '<div style="text-align:center">' + cb("bulk-tea",      ate.tea)      + '</div>' +
+        '<div style="text-align:center">' + cb("bulk-porridge", ate.porridge) + '</div>' +
+
+        '<div class="bulk-cost" id="bulk-cost-' + idx + '">KES ' + initCost + '</div>' +
+        '<div style="text-align:right" id="bulk-status-' + idx + '">' + status + '</div>' +
+
+        // Mobile cards
         '<div class="bulk-checks">' +
-          '<label class="bulk-check-item">' +
+          '<label class="bulk-check-item' + (ate.food ? ' locked-item' : '') + '">' +
             '<span class="check-icon">🍽️</span>' +
-            '<input type="checkbox" class="bulk-food-m" data-idx="' + idx + '"/>' +
+            cb("bulk-food-m", ate.food) +
             '<span class="check-label check-label-lunch">Lunch</span>' +
             '<span class="check-price">KES 50</span>' +
           '</label>' +
-          '<label class="bulk-check-item">' +
+          '<label class="bulk-check-item' + (ate.tea ? ' locked-item' : '') + '">' +
             '<span class="check-icon">☕</span>' +
-            '<input type="checkbox" class="bulk-tea-m" data-idx="' + idx + '"/>' +
+            cb("bulk-tea-m", ate.tea) +
             '<span class="check-label check-label-tea">Tea</span>' +
             '<span class="check-price">KES 15</span>' +
           '</label>' +
-          '<label class="bulk-check-item">' +
+          '<label class="bulk-check-item' + (ate.porridge ? ' locked-item' : '') + '">' +
             '<span class="check-icon">🌾</span>' +
-            '<input type="checkbox" class="bulk-porridge-m" data-idx="' + idx + '"/>' +
+            cb("bulk-porridge-m", ate.porridge) +
             '<span class="check-label check-label-porridge">Porridge</span>' +
             '<span class="check-price">KES 10</span>' +
           '</label>' +
         '</div>' +
+
         '<div class="bulk-footer-row">' +
-          '<span class="bulk-cost" id="bulk-cost-m-' + idx + '" style="color:var(--warning);font-family:var(--font-mono)">KES 0</span>' +
-          '<span class="bulk-status-pending" id="bulk-status-m-' + idx + '">Pending</span>' +
+          '<span class="bulk-cost" id="bulk-cost-m-' + idx + '" style="color:var(--warning);font-family:var(--font-mono)">KES ' + initCost + '</span>' +
+          '<span id="bulk-status-m-' + idx + '">' + status + '</span>' +
         '</div>' +
+
       '</div>';
   });
 
   container.innerHTML = html;
 
-  // Attach checkbox listeners
+  // Attach change listeners to unlocked checkboxes only
   bulkStudents.forEach(function (s, idx) {
-    ["bulk-food", "bulk-tea", "bulk-porridge"].forEach(function (cls) {
+    ["bulk-food","bulk-tea","bulk-porridge"].forEach(function (cls) {
       var el = container.querySelector("." + cls + '[data-idx="' + idx + '"]');
-      if (el) el.addEventListener("change", function () { syncMobileCheckbox(idx); updateBulkCost(idx); });
+      if (el && !el.disabled) el.addEventListener("change", function () {
+        syncMobile(idx); updateBulkCost(idx);
+      });
     });
-    ["bulk-food-m", "bulk-tea-m", "bulk-porridge-m"].forEach(function (cls) {
+    ["bulk-food-m","bulk-tea-m","bulk-porridge-m"].forEach(function (cls) {
       var el = container.querySelector("." + cls + '[data-idx="' + idx + '"]');
-      if (el) el.addEventListener("change", function () { syncDesktopCheckbox(idx); updateBulkCost(idx); });
+      if (el && !el.disabled) el.addEventListener("change", function () {
+        syncDesktop(idx); updateBulkCost(idx);
+      });
     });
   });
 }
 
 // ── Sync checkboxes ───────────────────────────────────────────
-function syncDesktopCheckbox(idx) {
-  [["bulk-food-m","bulk-food"],["bulk-tea-m","bulk-tea"],["bulk-porridge-m","bulk-porridge"]].forEach(function(p) {
+function syncDesktop(idx) {
+  [["bulk-food-m","bulk-food"],["bulk-tea-m","bulk-tea"],["bulk-porridge-m","bulk-porridge"]].forEach(function (p) {
     var m = document.querySelector("." + p[0] + '[data-idx="' + idx + '"]');
     var d = document.querySelector("." + p[1] + '[data-idx="' + idx + '"]');
-    if (m && d) d.checked = m.checked;
+    if (m && d && !d.disabled) d.checked = m.checked;
   });
 }
 
-function syncMobileCheckbox(idx) {
-  [["bulk-food","bulk-food-m"],["bulk-tea","bulk-tea-m"],["bulk-porridge","bulk-porridge-m"]].forEach(function(p) {
+function syncMobile(idx) {
+  [["bulk-food","bulk-food-m"],["bulk-tea","bulk-tea-m"],["bulk-porridge","bulk-porridge-m"]].forEach(function (p) {
     var d = document.querySelector("." + p[0] + '[data-idx="' + idx + '"]');
     var m = document.querySelector("." + p[1] + '[data-idx="' + idx + '"]');
-    if (d && m) m.checked = d.checked;
+    if (d && m && !m.disabled) m.checked = d.checked;
   });
 }
 
-// ── Update cost ───────────────────────────────────────────────
+// ── Update cost for one row ───────────────────────────────────
 function updateBulkCost(idx) {
-  var f = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-  var t = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
+  var f = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+  var t = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
   var p = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
   if (!f) return;
   var cost = (f.checked ? 50 : 0) + (t && t.checked ? 15 : 0) + (p && p.checked ? 10 : 0);
-  var el  = document.getElementById("bulk-cost-" + idx);
+  var el  = document.getElementById("bulk-cost-"   + idx);
   var elm = document.getElementById("bulk-cost-m-" + idx);
   if (el)  el.textContent  = "KES " + cost;
   if (elm) elm.textContent = "KES " + cost;
   updatePendingCount();
 }
 
-// ── Count pending ─────────────────────────────────────────────
+// ── Count pending rows ────────────────────────────────────────
 function updatePendingCount() {
   var pending = 0;
   bulkStudents.forEach(function (s, idx) {
     var st = document.getElementById("bulk-status-" + idx);
-    if (!st || st.classList.contains("bulk-status-done")) return;
-    var f = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-    var t = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
+    if (!st || st.querySelector(".bulk-status-done")) return;
+    var f = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+    var t = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
     var p = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
-    if (f && (f.checked || (t && t.checked) || (p && p.checked))) pending++;
+    if (f && !f.disabled && (f.checked || (t && t.checked) || (p && p.checked))) pending++;
   });
   var el = document.getElementById("pending-count");
   if (el) el.textContent = pending;
 }
 
-// ── Build queue and start ─────────────────────────────────────
+// ── Build queue from ticked unlocked rows ─────────────────────
 async function processBulk() {
   bulkQueue = [];
   bulkStudents.forEach(function (s, idx) {
     var st = document.getElementById("bulk-status-" + idx);
-    if (st && st.classList.contains("bulk-status-done")) return;
-    var f  = document.querySelector('.bulk-food[data-idx="' + idx + '"]');
-    var t  = document.querySelector('.bulk-tea[data-idx="' + idx + '"]');
-    var p  = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
+    if (st && st.querySelector(".bulk-status-done")) return;
+    var f = document.querySelector('.bulk-food[data-idx="'     + idx + '"]');
+    var t = document.querySelector('.bulk-tea[data-idx="'      + idx + '"]');
+    var p = document.querySelector('.bulk-porridge[data-idx="' + idx + '"]');
     if (!f) return;
-    var fC = f.checked, tC = t && t.checked, pC = p && p.checked;
+    // Only include unlocked + ticked items
+    var fC = f.checked  && !f.disabled;
+    var tC = t && t.checked  && !t.disabled;
+    var pC = p && p.checked  && !p.disabled;
     var cost = (fC ? 50 : 0) + (tC ? 15 : 0) + (pC ? 10 : 0);
     if (cost > 0) bulkQueue.push({ s:s, idx:idx, food:fC, tea:tC, porridge:pC, cost:cost });
   });
 
   if (bulkQueue.length === 0) {
-    showToast("No items ticked — tick what each student consumed first", "warning");
+    showToast("No new items ticked", "warning");
     return;
   }
-
   bulkIndex = 0;
   await showBulkModal();
 }
@@ -204,7 +283,6 @@ async function showBulkModal() {
   var contentEl = document.getElementById("bulk-modal-content");
   if (!modalEl || !titleEl || !contentEl) return;
 
-  // All done
   if (bulkIndex >= bulkQueue.length) {
     modalEl.classList.remove("open");
     showToast("Bulk record complete! " + bulkQueue.length + " student" + (bulkQueue.length !== 1 ? "s" : "") + " processed.", "success");
@@ -224,13 +302,9 @@ async function showBulkModal() {
     entry.porridge ? '<span class="badge badge-porridge">🌾 Porridge</span>' : ""
   ].filter(Boolean).join(" ");
 
-  // Check for duplicate meals — safely
   var dupWarn = "";
-  try {
-    dupWarn = await buildDuplicateWarning(s.admNo, s.name, date, entry.food, entry.tea, entry.porridge);
-  } catch (e) {
-    dupWarn = "";
-  }
+  try { dupWarn = await buildDuplicateWarning(s.admNo, s.name, date, entry.food, entry.tea, entry.porridge); }
+  catch (e) { dupWarn = ""; }
 
   titleEl.textContent = "Confirm — " + s.name + " (" + (bulkIndex + 1) + " of " + bulkQueue.length + ")";
 
@@ -238,7 +312,7 @@ async function showBulkModal() {
     '<div style="font-size:14px;line-height:1.8">' +
       '<div style="font-weight:600">' + s.name + '</div>' +
       '<div style="color:var(--muted);font-size:13px">' + s.displayGrade + '</div>' +
-      '<div class="confirm-items" style="margin:8px 0">' + items + '</div>' +
+      '<div style="margin:8px 0">' + items + '</div>' +
       '<div class="deduction-summary">' +
         '<div class="deduction-row"><span>Deduction</span><span class="text-warning text-mono">- KES ' + cost + '</span></div>' +
         '<div class="deduction-row"><span>Current Balance</span><span class="text-mono ' + (bal >= 0 ? "text-success" : "text-danger") + '">' + Sheets.formatBalance(bal) + '</span></div>' +
@@ -246,13 +320,13 @@ async function showBulkModal() {
       '</div>' +
       dupWarn +
       balanceWarningHtml(bal, cost) +
-      '<div style="margin-top:10px;color:var(--muted);font-size:13px">Did <strong style="color:var(--light)">' + s.name + '</strong> actually eat/drink these today?</div>' +
+      '<div style="margin-top:10px;color:var(--muted);font-size:13px">Did <strong style="color:var(--light)">' + s.name + '</strong> eat/drink these today?</div>' +
     '</div>';
 
   modalEl.classList.add("open");
 }
 
-// ── Confirm student with loading countdown ────────────────────
+// ── Confirm with loading countdown ────────────────────────────
 async function confirmBulkStudent() {
   var entry      = bulkQueue[bulkIndex];
   var s          = entry.s;
@@ -262,20 +336,14 @@ async function confirmBulkStudent() {
   var closeBtn   = document.getElementById("bulk-modal-close");
   var contentEl  = document.getElementById("bulk-modal-content");
 
-  // Disable buttons immediately — prevent double click
   if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = "Recording..."; }
   if (skipBtn)    skipBtn.disabled = true;
   if (closeBtn)   closeBtn.disabled = true;
 
-  var items = [
-    entry.food     ? "Lunch"    : "",
-    entry.tea      ? "Tea"      : "",
-    entry.porridge ? "Porridge" : ""
-  ].filter(Boolean).join(", ");
-
-  // Show loading + countdown
+  var items = [entry.food ? "Lunch" : "", entry.tea ? "Tea" : "", entry.porridge ? "Porridge" : ""].filter(Boolean).join(", ");
   var count = 1;
   var countEl = null;
+
   if (contentEl) {
     contentEl.innerHTML =
       '<div style="text-align:center;padding:20px 0">' +
@@ -288,49 +356,40 @@ async function confirmBulkStudent() {
     countEl = document.getElementById("bulk-countdown");
   }
 
-  var countInterval = setInterval(function () {
-    count++;
-    if (countEl) countEl.textContent = count;
-  }, 1000);
+  var timer = setInterval(function () { count++; if (countEl) countEl.textContent = count; }, 1000);
 
   try {
     var res = await Sheets.recordMeal({
-      admNo      : s.admNo,
-      name       : s.name,
-      grade      : s.grade,
-      food       : entry.food,
-      tea        : entry.tea,
-      porridge   : entry.porridge,
-      date       : document.getElementById("bulk-date").value || Sheets.today(),
-      recordedBy : ADMIN_NAME
+      admNo: s.admNo, name: s.name, grade: s.grade,
+      food: entry.food, tea: entry.tea, porridge: entry.porridge,
+      date: document.getElementById("bulk-date").value || Sheets.today(),
+      recordedBy: ADMIN_NAME
     });
 
-    clearInterval(countInterval);
+    clearInterval(timer);
 
-    // Show success
     if (contentEl) {
       contentEl.innerHTML =
         '<div style="text-align:center;padding:20px 0">' +
           '<div style="font-size:48px;margin-bottom:12px">✅</div>' +
           '<div style="font-size:15px;font-weight:600;color:var(--success)">' + s.name + ' recorded!</div>' +
-          '<div style="font-size:13px;color:var(--muted);margin-top:6px">KES ' + entry.cost + ' deducted · ' + items + '</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-top:6px">KES ' + entry.cost + ' · ' + items + '</div>' +
         '</div>';
     }
 
-    // Mark done
-    var stEl  = document.getElementById("bulk-status-" + idx);
+    // Mark row done
+    var stEl  = document.getElementById("bulk-status-"   + idx);
     var stElM = document.getElementById("bulk-status-m-" + idx);
-    if (stEl)  { stEl.textContent  = "Done ✅"; stEl.className  = "bulk-status-done"; }
-    if (stElM) { stElM.textContent = "Done ✅"; stElM.className = "bulk-status-done"; }
+    var done  = '<span class="bulk-status-done">Done ✅</span>';
+    if (stEl)  stEl.innerHTML  = done;
+    if (stElM) stElM.innerHTML = done;
     var rowEl = document.getElementById("bulk-row-" + idx);
     if (rowEl) rowEl.classList.add("done");
 
-    // Update local
     allTxHistory[s.admNo] = (allTxHistory[s.admNo] || 0) + 1;
     var found = allStudents.find(function (a) { return String(a.admNo) === String(s.admNo); });
     if (found) { found.balance = res.newBalance; found.type = res.type; }
 
-    // Wait 1 second then next
     setTimeout(async function () {
       bulkIndex++;
       updatePendingCount();
@@ -341,26 +400,23 @@ async function confirmBulkStudent() {
     }, 1000);
 
   } catch (err) {
-    clearInterval(countInterval);
+    clearInterval(timer);
     showToast("Error for " + s.name + ": " + err.message, "error");
-
     if (contentEl) {
       contentEl.innerHTML =
         '<div style="text-align:center;padding:20px 0">' +
           '<div style="font-size:48px;margin-bottom:12px">❌</div>' +
           '<div style="font-size:14px;color:var(--danger)">Failed to record ' + s.name + '.</div>' +
           '<div style="font-size:12px;color:var(--muted);margin-top:8px">' + err.message + '</div>' +
-          '<div style="font-size:13px;color:var(--muted);margin-top:12px">Try again or skip.</div>' +
         '</div>';
     }
-
     if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = "✅ Yes, Confirm"; }
     if (skipBtn)    skipBtn.disabled = false;
     if (closeBtn)   closeBtn.disabled = false;
   }
 }
 
-// ── Skip student ──────────────────────────────────────────────
+// ── Skip ──────────────────────────────────────────────────────
 async function skipBulkStudent() {
   bulkIndex++;
   await showBulkModal();

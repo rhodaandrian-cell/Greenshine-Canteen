@@ -1,0 +1,72 @@
+/* ============================================================
+   GREENSHINE ACADEMY — Canteen Finance Management System
+   weekly-report.css — Weekly Report Page Styles
+   ============================================================ */
+
+/* ── Loading overlay ──────────────────────────────────────── */
+#loading-overlay {
+  position       : fixed;
+  inset          : 0;
+  background     : var(--dark);
+  z-index        : 999;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  flex-direction : column;
+  gap            : 16px;
+  color          : var(--muted);
+  font-size      : 14px;
+}
+
+/* ── Week navigation ──────────────────────────────────────── */
+.week-nav {
+  display    : flex;
+  align-items: center;
+  gap        : 12px;
+  flex-wrap  : wrap;
+  margin-bottom: 20px;
+}
+
+.week-label {
+  font-size  : 15px;
+  font-weight: 600;
+  color      : var(--light);
+  flex       : 1;
+  text-align : center;
+}
+
+/* ── Day columns in table ─────────────────────────────────── */
+.day-col {
+  text-align: center;
+  min-width : 80px;
+}
+
+/* ── Meal icons ───────────────────────────────────────────── */
+.meal-dot {
+  display        : inline-flex;
+  flex-direction : column;
+  align-items    : center;
+  gap            : 1px;
+  font-size      : 15px;
+  line-height    : 1.3;
+}
+
+.no-meal {
+  color    : var(--muted-2);
+  font-size: 16px;
+}
+
+/* ── Print styles ─────────────────────────────────────────── */
+@media print {
+  #particle-canvas,
+  .topbar-actions,
+  .week-nav button,
+  .sidebar,
+  .bottom-nav,
+  #loading-overlay { display: none !important; }
+
+  .main-content { margin-left: 0 !important; }
+  body          { background: white !important; color: black !important; }
+  .card         { border: 1px solid #ddd !important; background: white !important; }
+  thead th      { background: #1a5c2e !important; color: white !important; }
+}
