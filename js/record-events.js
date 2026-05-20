@@ -14,29 +14,25 @@ window.addEventListener("load", function () {
 
   // ── Tabs ──────────────────────────────────────────────────
   on("tbtn-payment", "click", function () { switchTab("payment"); });
-  on("tbtn-meal",    "click", function () { switchTab("meal");    });
   on("tbtn-bulk",    "click", function () { switchTab("bulk");    });
+  // tbtn-meal removed — single meal tab has been removed
 
   // ── Payment ───────────────────────────────────────────────
   on("pay-search", "input",  function () { searchStudents("pay", this.value); });
   on("pay-amount", "input",  function () { updatePayPreview(); });
   on("pay-btn",    "click",  function () { submitPayment(); });
 
-  // ── Meal ──────────────────────────────────────────────────
-  on("meal-search",   "input",  function () { searchStudents("meal", this.value); });
-  on("meal-food",     "change", function () { updateMealPreview(); });
-  on("meal-tea",      "change", function () { updateMealPreview(); });
-  on("meal-porridge", "change", function () { updateMealPreview(); });
-  on("meal-btn",      "click",  function () { showMealConfirm(); });
-
-  // ── Meal modal ────────────────────────────────────────────
-  on("meal-modal-cancel",   "click", function () { closeMealModal(); });
-  on("meal-modal-cancel-2", "click", function () { closeMealModal(); });
-  on("meal-modal-confirm",  "click", function () { submitMeal(); });
-
   // ── Bulk ──────────────────────────────────────────────────
   on("bulk-grade",       "change", function () { loadBulkClass(); });
   on("bulk-process-btn", "click",  async function () { await processBulk(); });
+
+  // ── Bulk date: if a class is already selected, reload it ──
+  on("bulk-date", "change", function () {
+    var gradeEl = document.getElementById("bulk-grade");
+    if (gradeEl && gradeEl.value) {
+      loadBulkClass();
+    }
+  });
 
   // ── Bulk modal ────────────────────────────────────────────
   on("bulk-modal-close",   "click", async function () { await skipBulkStudent(); });

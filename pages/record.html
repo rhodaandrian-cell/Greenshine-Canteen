@@ -62,10 +62,9 @@
 
     <div class="page-body">
 
-      <!-- Tabs -->
+      <!-- ── Tabs — Meal tab removed ── -->
       <div class="tabs">
         <button class="tab-btn active" id="tbtn-payment">💰 Record Payment</button>
-        <button class="tab-btn"        id="tbtn-meal">🍽️ Record Meal</button>
         <button class="tab-btn"        id="tbtn-bulk">📋 Bulk Daily Record</button>
       </div>
 
@@ -139,76 +138,7 @@
         </div>
       </div>
 
-      <!-- ══ TAB 2: RECORD MEAL ══════════════════════════════ -->
-      <div id="tab-meal" class="tab-content">
-        <div style="max-width:520px">
-          <div class="card">
-            <div class="card-header">🍽️ Record What a Student Ate / Drank</div>
-            <div class="card-body">
-
-              <div class="form-group">
-                <label class="form-label">Student</label>
-                <div class="autocomplete-wrap">
-                  <input type="text" id="meal-search" class="form-control"
-                    placeholder="Type student name..." autocomplete="off"/>
-                  <div class="autocomplete-list" id="meal-dropdown"></div>
-                </div>
-                <div id="meal-selected" class="student-selected-bar mt-8" style="display:none">
-                  <div>
-                    <div class="s-name" id="meal-s-name">—</div>
-                    <div class="s-meta" id="meal-s-meta">—</div>
-                  </div>
-                  <div class="s-bal" id="meal-s-bal">—</div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Date</label>
-                <input type="date" id="meal-date" class="form-control"/>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Items Consumed Today</label>
-                <div class="checkbox-item">
-                  <label><input type="checkbox" id="meal-food"/> 🍽️ Lunch (Food)</label>
-                  <span class="checkbox-price">KES 50</span>
-                </div>
-                <div class="checkbox-item">
-                  <label><input type="checkbox" id="meal-tea"/> ☕ Tea</label>
-                  <span class="checkbox-price">KES 15</span>
-                </div>
-                <div class="checkbox-item">
-                  <label><input type="checkbox" id="meal-porridge"/> 🌾 Porridge</label>
-                  <span class="checkbox-price">KES 10</span>
-                </div>
-              </div>
-
-              <div class="deduction-summary">
-                <div class="deduction-row">
-                  <span>Deduction</span>
-                  <span id="meal-prev-deduction" class="text-mono">KES 0</span>
-                </div>
-                <div class="deduction-row">
-                  <span>Current Balance</span>
-                  <span id="meal-prev-current" class="text-mono">—</span>
-                </div>
-                <div class="deduction-row total">
-                  <span>Balance After</span>
-                  <span id="meal-prev-after" class="text-mono">—</span>
-                </div>
-              </div>
-
-              <button class="btn btn-primary" id="meal-btn"
-                style="width:100%;justify-content:center;margin-top:16px" disabled>
-                Confirm Deduction
-              </button>
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ TAB 3: BULK DAILY RECORD ════════════════════════ -->
+      <!-- ══ TAB 2: BULK DAILY RECORD ════════════════════════ -->
       <div id="tab-bulk" class="tab-content">
         <div class="card">
           <div class="card-header">
@@ -226,6 +156,7 @@
               Tick what each student consumed then click
               <strong style="color:var(--light)">Process All</strong>.
               Each student is confirmed one by one. 🔥 = frequent eater.
+              Changing the date above automatically reloads the same class.
             </p>
 
             <!-- Horizontal scroll wrapper for mobile -->
@@ -279,21 +210,6 @@
   </div>
 </div>
 
-<!-- ── Meal Confirm Modal ── -->
-<div class="modal-overlay" id="meal-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">🍽️ Confirm Deduction</div>
-      <button class="modal-close" id="meal-modal-cancel">✕</button>
-    </div>
-    <div id="meal-modal-content"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" id="meal-modal-cancel-2">✕ Cancel</button>
-      <button class="btn btn-primary"   id="meal-modal-confirm">✅ Yes, Confirm</button>
-    </div>
-  </div>
-</div>
-
 <!-- ── Bulk Confirm Modal ── -->
 <div class="modal-overlay" id="bulk-modal">
   <div class="modal">
@@ -319,34 +235,33 @@
 <script src="../js/animation.js"></script>
 <script src="../js/record-init.js"></script>
 <script src="../js/recordpayment.js"></script>
-<script src="../js/recordmeal.js"></script>
 <script src="../js/dailyrecord.js"></script>
 <script src="../js/record-events.js"></script>
 <script src="../js/sidebar.js"></script>
 
-
 <!-- Bottom Navigation — mobile phones -->
 <nav class="bottom-nav">
-    <a href="dashboard.html" class="bottom-nav-item">
-      <span class="bottom-nav-icon">📊</span>
-      <span class="bottom-nav-label">Dashboard</span>
-    </a>
-    <a href="students.html" class="bottom-nav-item">
-      <span class="bottom-nav-icon">👤</span>
-      <span class="bottom-nav-label">Students</span>
-    </a>
-    <a href="record.html" class="bottom-nav-item active">
-      <span class="bottom-nav-icon">✏️</span>
-      <span class="bottom-nav-label">Record</span>
-    </a>
-    <a href="watchlist.html" class="bottom-nav-item">
-      <span class="bottom-nav-icon">⚠️</span>
-      <span class="bottom-nav-label">Watchlist</span>
-    </a>
-    <a href="reports.html" class="bottom-nav-item">
-      <span class="bottom-nav-icon">📋</span>
-      <span class="bottom-nav-label">Reports</span>
-    </a>
+  <a href="dashboard.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">📊</span>
+    <span class="bottom-nav-label">Dashboard</span>
+  </a>
+  <a href="students.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">👤</span>
+    <span class="bottom-nav-label">Students</span>
+  </a>
+  <a href="record.html" class="bottom-nav-item active">
+    <span class="bottom-nav-icon">✏️</span>
+    <span class="bottom-nav-label">Record</span>
+  </a>
+  <a href="watchlist.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">⚠️</span>
+    <span class="bottom-nav-label">Watchlist</span>
+  </a>
+  <a href="reports.html" class="bottom-nav-item">
+    <span class="bottom-nav-icon">📋</span>
+    <span class="bottom-nav-label">Reports</span>
+  </a>
 </nav>
+
 </body>
 </html>
