@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>"/>
+  <title>Meal Calendar — Greenshine Canteen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link rel="stylesheet" href="../assets/css/responsive.css"/>
+  <link rel="stylesheet" href="../assets/css/meal-calendar.css"/>
+</head>
+<body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="avatar">G</div>
+        <div class="sidebar-logo-text">
+          <h1>Greenshine Academy</h1>
+          <span>Canteen Finance System</span>
+        </div>
+      </div>
+      <div class="sidebar-section-label">Main</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a class="nav-item" href="students.html"><span class="nav-icon">👤</span> Students</a>
+        <a class="nav-item" href="record.html"><span class="nav-icon">✏️</span> Record Transaction</a>
+      </nav>
+      <div class="sidebar-section-label">Alerts</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="watchlist.html">
+          <span class="nav-icon">⚠️</span> Watchlist
+          <span class="nav-badge" id="watchlist-count">—</span>
+        </a>
+      </nav>
+      <div class="sidebar-section-label">Reports</div>
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
+        <a class="nav-item" href="weekly-report.html"><span class="nav-icon">📅</span> Weekly Report</a>
+        <a class="nav-item active" href="meal-calendar.html"><span class="nav-icon">🗓️</span> Meal Calendar</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="avatar">A</div>
+        <div>
+          <div class="sidebar-user-name">Admin</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content">
+
+      <!-- Topbar -->
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">🗓️ Meal Calendar</div>
+          <div class="topbar-date" id="today-date">—</div>
+        </div>
+        <div class="topbar-actions no-print">
+          <button class="btn btn-secondary" onclick="generateCalendar()">🔄 Generate</button>
+          <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+
+      <!-- Page Body -->
+      <div class="page-body">
+
+        <!-- Controls Panel -->
+        <div class="controls-panel no-print">
+          <div class="controls-title">📋 Calendar Options</div>
+
+          <!-- Mode Tabs -->
+          <div class="mode-tabs">
+            <button class="mode-tab active" id="tab-student" onclick="switchMode('student')">👤 Per Student</button>
+            <button class="mode-tab"        id="tab-class"   onclick="switchMode('class')">🏫 Per Class</button>
+          </div>
+
+          <div class="controls-row">
+
+            <!-- Student search -->
+            <div class="ctrl-group" id="grp-student">
+              <div class="ctrl-label">Student</div>
+              <div class="search-wrap">
+                <input
+                  class="ctrl-input"
+                  id="student-search"
+                  type="text"
+                  placeholder="Search name or adm no…"
+                  oninput="searchStudents(this.value)"
+                  autocomplete="off"
+                />
+                <div id="student-dropdown" class="student-dropdown hidden"></div>
+              </div>
+            </div>
+
+            <!-- Class select -->
+            <div class="ctrl-group hidden" id="grp-class">
+              <div class="ctrl-label">Class</div>
+              <select class="ctrl-select" id="class-select">
+                <option value="">All Classes</option>
+                <option value="PP1">PP1</option>
+                <option value="PP2">PP2</option>
+                <option value="PG">PG</option>
+                <option value="Grade 1">Grade 1</option>
+                <option value="Grade 2">Grade 2</option>
+                <option value="Grade 3">Grade 3</option>
+                <option value="Grade 4">Grade 4</option>
+                <option value="Grade 5">Grade 5</option>
+                <option value="Grade 6">Grade 6</option>
+              </select>
+            </div>
+
+            <!-- Period -->
+            <div class="ctrl-group">
+              <div class="ctrl-label">Period</div>
+              <select class="ctrl-select" id="period-select" onchange="handlePeriodChange()">
+                <option value="this-week">This Week</option>
+                <option value="this-month" selected>This Month</option>
+                <option value="term1">Term 1 (Jan–Mar)</option>
+                <option value="term2">Term 2 (May–Jul)</option>
+                <option value="term3">Term 3 (Sep–Nov)</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+
+            <!-- Custom from -->
+            <div class="ctrl-group hidden" id="grp-custom-from">
+              <div class="ctrl-label">From</div>
+              <input class="ctrl-input ctrl-input--date" id="custom-from" type="date"/>
+            </div>
+
+            <!-- Custom to -->
+            <div class="ctrl-group hidden" id="grp-custom-to">
+              <div class="ctrl-label">To</div>
+              <input class="ctrl-input ctrl-input--date" id="custom-to" type="date"/>
+            </div>
+
+            <!-- Generate button -->
+            <div class="ctrl-group ctrl-group--action">
+              <div class="ctrl-label">&nbsp;</div>
+              <button class="btn btn-primary" onclick="generateCalendar()">Generate Calendar</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Calendar output -->
+        <div id="calendar-output">
+          <div class="empty-prompt">
+            <div class="empty-prompt-icon">🗓️</div>
+            <p>Select a student or class, choose a period, then click <strong>Generate Calendar</strong>.</p>
+          </div>
+        </div>
+
+      </div><!-- /page-body -->
+    </div><!-- /main-content -->
+  </div><!-- /app-layout -->
+
+  <div id="toast-container"></div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/animation.js"></script>
+  <script src="../js/sheets.js"></script>
+  <script src="../js/meal-calendar.js"></script>
+
+</body>
+</html>
