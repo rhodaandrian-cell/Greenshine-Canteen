@@ -43,7 +43,6 @@ function testGetStudents() {
 }
 
 function testPost() {
-  // Simulates what the frontend will send as a POST request
   var e = {
     postData: {
       contents: JSON.stringify({ action: "getStudents" }),
@@ -67,15 +66,13 @@ function testDashboard() {
 
 // ============================================================
 // WEB APP ENTRY POINTS
-// doGet — returns a simple status page (browser visits)
-// doPost — all real requests from the frontend use POST
 // ============================================================
 function doGet(e) {
   var html = "<h2>Greenshine Academy — Canteen API</h2>"
            + "<p>Status: <strong style='color:green'>Online</strong></p>"
            + "<p>Send POST requests with a JSON body: <code>{action: 'getStudents'}</code></p>"
            + "<p>Available actions: getStudents, getBalances, getTransactions, getDashboard, "
-           + "recordPayment, recordMeal, recordBulkMeals, getWatchlist, getReports</p>";
+           + "recordPayment, recordMeal, recordBulkMeals, undoMeal, getWatchlist, getReports, checkTodayMeals</p>";
   return HtmlService.createHtmlOutput(html);
 }
 
@@ -89,7 +86,6 @@ function handleRequest(e) {
     var params = {};
     var action = "";
 
-    // Read from POST body
     if (e && e.postData && e.postData.contents) {
       params = JSON.parse(e.postData.contents);
       action = params.action || "";
@@ -112,9 +108,10 @@ function handleRequest(e) {
       case "recordPayment":   result = recordPayment(params);         break;
       case "recordMeal":      result = recordMeal(params);            break;
       case "recordBulkMeals": result = recordBulkMeals(params);       break;
+      case "undoMeal":        result = undoMeal(params);              break;
       case "getWatchlist":    result = getWatchlist();                break;
-      case "getReports":         result = getReports(params);             break;
-      case "checkTodayMeals":   result = checkTodayMeals(params);        break;
+      case "getReports":      result = getReports(params);            break;
+      case "checkTodayMeals": result = checkTodayMeals(params);       break;
       default: result = { error: "Unknown action: " + action };
     }
   } catch (err) {
@@ -348,6 +345,8 @@ function recordMeal(params) {
     amount, "", recordedBy, new Date()
   ]);
 
+  // rowIndex is the row just appended — used by undoMeal
+  var rowIndex   = txSheet.getLastRow();
   var newBalance = updateBalance(admNo, name, grade, -amount, "MEAL", date);
   var newType    = autoAssignType(admNo);
 
@@ -357,6 +356,7 @@ function recordMeal(params) {
     deduction : amount,
     newBalance: newBalance,
     type      : newType,
+    rowIndex  : rowIndex,
     message   : "Meal of KES " + amount + " deducted for " + name
   };
 }
@@ -372,7 +372,54 @@ function recordBulkMeals(params) {
 }
 
 // ============================================================
-// 8. GET WATCHLIST
+// 8. UNDO MEAL — reverse a meal deduction
+// params: { admNo, name, grade, amount, rowIndex, oldBalance, oldType }
+// ============================================================
+function undoMeal(params) {
+  var admNo      = String(params.admNo).trim();
+  var amount     = Number(params.amount) || 0;
+  var rowIndex   = params.rowIndex ? Number(params.rowIndex) : null;
+  var oldBalance = Number(params.oldBalance) || 0;
+  var oldType    = params.oldType || "0";
+
+  // Delete the transaction row if we have its index
+  if (rowIndex) {
+    try {
+      var txSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TRANSACTIONS);
+      var lastRow = txSheet.getLastRow();
+      // Only delete if rowIndex is valid and within range
+      if (rowIndex >= 2 && rowIndex <= lastRow) {
+        txSheet.deleteRow(rowIndex);
+      }
+    } catch (e) {
+      // Row may have shifted — proceed with balance correction anyway
+    }
+  }
+
+  // Restore balance and type in SHEET_BALANCES
+  var balSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_BALANCES);
+  var data     = balSheet.getDataRange().getValues();
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === admNo) {
+      var currentSpent = Number(data[i][6]) || 0;
+      balSheet.getRange(i + 1, 4).setValue(oldType);                              // type
+      balSheet.getRange(i + 1, 5).setValue(oldBalance);                           // balance
+      balSheet.getRange(i + 1, 7).setValue(Math.max(0, currentSpent - amount));   // totalSpent
+      break;
+    }
+  }
+
+  return {
+    success        : true,
+    admNo          : admNo,
+    restoredBalance: oldBalance,
+    restoredType   : oldType
+  };
+}
+
+// ============================================================
+// 9. GET WATCHLIST
 // ============================================================
 function getWatchlist() {
   var balances         = getBalances().balances;
@@ -433,7 +480,7 @@ function getWatchlist() {
 }
 
 // ============================================================
-// 9. GET REPORTS
+// 10. GET REPORTS
 // ============================================================
 function getReports(params) {
   var reportType   = params.reportType || "daily";
@@ -523,7 +570,7 @@ function updateBalance(admNo, name, grade, amount, txType, date) {
     }
   }
 
-  // Not found — create new row
+  // Not found — create new balance row
   var initTopUp    = txType === "PAYMENT" ? amount : 0;
   var initSpent    = txType === "MEAL"    ? Math.abs(amount) : 0;
   var initLastPay  = txType === "PAYMENT" ? date : "";
@@ -682,7 +729,6 @@ function checkTodayMeals(params) {
     if (row[1] !== "MEAL") continue;
     if (formatDate(row[0]) !== date) continue;
 
-    // Found a meal record for this student today
     if (row[6] === "YES") todayItems.food     = true;
     if (row[7] === "YES") todayItems.tea      = true;
     if (row[8] === "YES") todayItems.porridge = true;

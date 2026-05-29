@@ -6,13 +6,12 @@
 const Sheets = {
 
   // ── Core POST function ───────────────────────────────────
-  // All requests go through here as POST with JSON body
   async post(action, params = {}) {
     try {
-      const body = JSON.stringify({ action, ...params });
+      const body     = JSON.stringify({ action, ...params });
       const response = await fetch(GREENSHINE.API_URL, {
-        method     : "POST",
-        body       : body,
+        method : "POST",
+        body   : body,
       });
       const data = await response.json();
       if (data.error) throw new Error(data.error);
@@ -51,6 +50,7 @@ const Sheets = {
 
   // ── 6. Record a meal deduction ───────────────────────────
   // params: { admNo, name, grade, food, tea, porridge, date, recordedBy }
+  // Returns: { success, admNo, deduction, newBalance, type, rowIndex }
   async recordMeal(params) {
     return await this.post("recordMeal", params);
   },
@@ -61,17 +61,29 @@ const Sheets = {
     return await this.post("recordBulkMeals", { meals });
   },
 
-  // ── 8. Get watchlist ─────────────────────────────────────
+  // ── 8. Undo a meal deduction ─────────────────────────────
+  // params: { admNo, name, grade, amount, rowIndex, oldBalance, oldType }
+  // Deletes the transaction row and restores the student's balance
+  async undoMeal(params) {
+    return await this.post("undoMeal", params);
+  },
+
+  // ── 9. Get watchlist ─────────────────────────────────────
   async getWatchlist() {
     return await this.post("getWatchlist");
   },
 
-  // ── 9. Get reports ───────────────────────────────────────
+  // ── 10. Get reports ──────────────────────────────────────
   // reportType: "daily" | "weekly" | "monthly" | "allBalances" | "byType"
   async getReports(reportType = "daily", date = null) {
     const params = { reportType };
     if (date) params.date = date;
     return await this.post("getReports", params);
+  },
+
+  // ── 11. Check today meals for a student ──────────────────
+  async checkTodayMeals(admNo, date) {
+    return await this.post("checkTodayMeals", { admNo: admNo, date: date || this.today() });
   },
 
   // ── HELPERS ──────────────────────────────────────────────
@@ -96,25 +108,20 @@ const Sheets = {
     }));
   },
 
-  // ── Check what a student has already eaten today ────────────
-  async checkTodayMeals(admNo, date) {
-    return await this.post("checkTodayMeals", { admNo: admNo, date: date || this.today() });
-  },
-
   // Get students filtered by grade
   async getStudentsByGrade(grade) {
     const students = await this.getStudentsWithBalances();
     return students.filter(s => String(s.grade) === String(grade));
   },
 
-  // Format balance for display
+  // Format balance for display — e.g. "KES 500" or "-KES 120"
   formatBalance(amount) {
     const abs    = Math.abs(amount);
     const prefix = amount < 0 ? "-" : "";
     return `${prefix}KES ${abs.toLocaleString()}`;
   },
 
-  // Format date for display
+  // Format date string for display — e.g. "31 Mar 2025"
   formatDate(dateStr) {
     if (!dateStr) return "—";
     const d = new Date(dateStr);
@@ -141,10 +148,10 @@ const Sheets = {
     return `<span class="badge badge-type" style="background:${t.color}20;color:${t.color};border:1px solid ${t.color}40">${type} · ${t.label}</span>`;
   },
 
-  // Get balance color class
+  // Get balance CSS colour class
   balanceClass(amount) {
-    if (amount > 0)  return "positive";
-    if (amount < 0)  return "negative";
+    if (amount > 0) return "positive";
+    if (amount < 0) return "negative";
     return "zero";
   }
 

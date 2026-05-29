@@ -4,19 +4,19 @@
    ============================================================ */
 
 /* ── Tab content visibility ───────────────────────────────── */
-.tab-content         { display: none; }
-.tab-content.active  { display: block; }
+.tab-content        { display: none; }
+.tab-content.active { display: block; }
 
 /* ── Student selected bar ─────────────────────────────────── */
 .student-selected-bar {
-  background   : rgba(139,58,42,0.12);
-  border       : 1px solid rgba(139,58,42,0.3);
-  border-radius: var(--radius-sm);
-  padding      : 10px 14px;
-  display      : flex;
-  align-items  : center;
+  background     : rgba(139, 58, 42, 0.12);
+  border         : 1px solid rgba(139, 58, 42, 0.3);
+  border-radius  : var(--radius-sm);
+  padding        : 10px 14px;
+  display        : flex;
+  align-items    : center;
   justify-content: space-between;
-  font-size    : 14px;
+  font-size      : 14px;
 }
 
 .student-selected-bar .s-name { font-weight: 600; color: var(--light); }
@@ -50,30 +50,18 @@
 }
 
 .bulk-header-cell {
-  display       : flex;
-  flex-direction: column;
-  align-items   : center;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
   justify-content: center;
-  text-align    : center;
-  gap           : 2px;
-  line-height   : 1.4;
+  text-align     : center;
+  gap            : 2px;
+  line-height    : 1.4;
 }
 
-.bulk-header-cell .cell-icon {
-  font-size  : 20px;
-  line-height: 1;
-}
-
-.bulk-header-cell .cell-label {
-  font-size  : 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.bulk-header-cell .cell-price {
-  font-size: 10px;
-  color    : var(--muted);
-}
+.bulk-header-cell .cell-icon  { font-size: 20px; line-height: 1; }
+.bulk-header-cell .cell-label { font-size: 11px; font-weight: 700; white-space: nowrap; }
+.bulk-header-cell .cell-price { font-size: 10px; color: var(--muted); }
 
 .label-lunch    { color: #2ecc71; }
 .label-tea      { color: #3498db; }
@@ -81,15 +69,31 @@
 
 /* ── Bulk checkboxes ──────────────────────────────────────── */
 .bulk-row input[type="checkbox"] {
-  width        : 18px;
-  height       : 18px;
-  accent-color : var(--accent);
-  cursor       : pointer;
-  display      : block;
-  margin       : 0 auto;
+  width       : 18px;
+  height      : 18px;
+  accent-color: var(--accent);
+  cursor      : pointer;
+  display     : block;
+  margin      : 0 auto;
 }
 
-/* ── Bulk cost + status ───────────────────────────────────── */
+/* ── Bulk student name + meta ─────────────────────────────── */
+.bulk-student-name {
+  font-size  : 13px;
+  font-weight: 600;
+  color      : var(--light);
+}
+
+.bulk-student-meta {
+  font-size : 12px;
+  color     : var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Bulk type badge cell ─────────────────────────────────── */
+.bulk-type-badge { display: flex; align-items: center; }
+
+/* ── Bulk cost ────────────────────────────────────────────── */
 .bulk-cost {
   font-family: var(--font-mono);
   font-size  : 13px;
@@ -97,15 +101,35 @@
   text-align : right;
 }
 
+/* ── Bulk status badges ───────────────────────────────────── */
 .bulk-status-pending {
-  color    : var(--muted);
-  font-size: 12px;
+  color      : var(--muted);
+  font-size  : 12px;
+  font-weight: 400;
+}
+
+.bulk-status-ready {
+  color      : var(--success);
+  font-size  : 12px;
+  font-weight: 500;
+}
+
+.bulk-status-overeat {
+  color      : var(--warning);
+  font-size  : 12px;
+  font-weight: 600;
 }
 
 .bulk-status-done {
   color      : var(--success);
   font-size  : 12px;
   font-weight: 600;
+}
+
+.bulk-status-partial {
+  color      : var(--info, #3498db);
+  font-size  : 12px;
+  font-weight: 500;
 }
 
 /* ── Confirm items in modal ───────────────────────────────── */
@@ -116,7 +140,7 @@
   margin   : 8px 0;
 }
 
-/* ── Responsive ───────────────────────────────────────────── */
+/* ── Responsive — tighter columns on small desktop ───────── */
 @media (max-width: 700px) {
   .bulk-row {
     grid-template-columns: 1.5fr 0.5fr 50px 50px 60px 70px 60px;
@@ -126,18 +150,18 @@
 }
 
 /* ── Mobile card elements — hidden on desktop ─────────────── */
-.bulk-checks      { display: none; }
-.bulk-footer-row  { display: none; }
+.bulk-checks     { display: none; }
+.bulk-footer-row { display: none; }
 
 /* ── Already eaten items ──────────────────────────────────── */
 .already-eaten {
   opacity       : 0.5;
   pointer-events: none;
-  border-color  : rgba(46,204,113,0.3) !important;
-  background    : rgba(46,204,113,0.05) !important;
+  border-color  : rgba(46, 204, 113, 0.3) !important;
+  background    : rgba(46, 204, 113, 0.05) !important;
 }
 
-/* ── Locked meal checkbox — already recorded, cannot change ── */
+/* ── Locked meal checkbox — already recorded ──────────────── */
 input[type="checkbox"].locked-meal {
   opacity       : 0.45;
   cursor        : not-allowed;
@@ -146,23 +170,21 @@ input[type="checkbox"].locked-meal {
   pointer-events: none;
 }
 
-/* Parent label also not-allowed */
 input[type="checkbox"].locked-meal + span,
 input[type="checkbox"].locked-meal ~ span {
   opacity: 0.5;
   cursor : not-allowed;
 }
 
-/* Locked check items on mobile */
 .bulk-check-item:has(input.locked-meal) {
   opacity       : 0.45;
   cursor        : not-allowed;
-  border-color  : rgba(46,204,113,0.3);
-  background    : rgba(46,204,113,0.08);
+  border-color  : rgba(46, 204, 113, 0.3);
+  background    : rgba(46, 204, 113, 0.08);
   pointer-events: none;
 }
 
-/* ── Locked checkboxes — already recorded, cannot change ─── */
+/* ── Locked checkboxes (disabled, already recorded) ──────── */
 .locked-check {
   opacity       : 0.4;
   cursor        : not-allowed !important;
@@ -171,21 +193,21 @@ input[type="checkbox"].locked-meal ~ span {
   pointer-events: none;
 }
 
-/* Parent cell blurred when locked */
 .bulk-row input.locked-check + * { opacity: 0.4; }
 
-/* Mobile card — locked item */
 .bulk-check-item:has(.locked-check) {
   opacity       : 0.5;
   cursor        : not-allowed;
-  border-color  : rgba(46,204,113,0.3) !important;
-  background    : rgba(46,204,113,0.05) !important;
+  border-color  : rgba(46, 204, 113, 0.3) !important;
+  background    : rgba(46, 204, 113, 0.05) !important;
   pointer-events: none;
 }
 
-/* Partial status badge */
-.bulk-status-partial {
-  color    : var(--info);
-  font-size: 12px;
-  font-weight: 500;
+/* ── Locked item on mobile card ───────────────────────────── */
+.bulk-check-item.locked-item {
+  opacity       : 0.45;
+  cursor        : not-allowed;
+  pointer-events: none;
+  border-color  : rgba(46, 204, 113, 0.3) !important;
+  background    : rgba(46, 204, 113, 0.06) !important;
 }
