@@ -1,0 +1,13 @@
+{
+  "name": "greenshine-canteen",
+  "version": "1.0.0",
+  "description": "Greenshine Academy Canteen Finance System",
+  "scripts": {
+    "build": "babel js/BulkTable.jsx --out-file js/BulkTable.js && babel js/BulkModal.jsx --out-file js/BulkModal.js && babel js/BulkDailyRecord.jsx --out-file js/BulkDailyRecord.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.0",
+    "@babel/core": "^7.24.0",
+    "@babel/preset-react": "^7.24.0"
+  }
+}

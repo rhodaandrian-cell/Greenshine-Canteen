@@ -66,3 +66,4 @@ const GREENSHINE = {
   }
 
 };
+window.GREENSHINE = GREENSHINE;

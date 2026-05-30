@@ -40,8 +40,6 @@
     <div class="sidebar-section-label">Reports</div>
     <nav class="sidebar-nav">
       <a class="nav-item" href="reports.html"><span class="nav-icon">📋</span> Reports</a>
-      <a class="nav-item" href="weekly-report.html"><span class="nav-icon">📅</span> Weekly Report</a>
-      <a class="nav-item" href="meal-calendar.html"><span class="nav-icon">🗓️</span> Meal Calendar</a>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">A</div>
@@ -70,7 +68,7 @@
         <button class="tab-btn"        id="tbtn-bulk">📋 Bulk Daily Record</button>
       </div>
 
-      <!-- ══ TAB 1: RECORD PAYMENT ══════════════════════════ -->
+      <!-- ══ TAB 1: RECORD PAYMENT — unchanged ══ -->
       <div id="tab-payment" class="tab-content active">
         <div style="max-width:520px">
           <div class="card">
@@ -140,123 +138,16 @@
         </div>
       </div>
 
-      <!-- ══ TAB 2: BULK DAILY RECORD ════════════════════════ -->
+      <!-- ══ TAB 2: BULK DAILY RECORD (React) ══ -->
       <div id="tab-bulk" class="tab-content">
-        <div class="card">
-
-          <!-- Card header — class + date only, no search here -->
-          <div class="card-header">
-            📋 Bulk Daily Meal Record
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <select class="form-control" id="bulk-grade" style="width:auto">
-                <option value="">Select Class</option>
-              </select>
-              <input type="date" id="bulk-date" class="form-control" style="width:auto"/>
-            </div>
-          </div>
-
-          <div class="card-body">
-
-            <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-              Tick what each student consumed then click
-              <strong style="color:var(--light)">Process All</strong>.
-              Each student is confirmed one by one. 🔥 = frequent eater.
-              Changing the date above automatically reloads the same class.
-            </p>
-
-            <!-- Done / Pending counter — hidden until class loads -->
-            <div id="bulk-counter" style="display:none;align-items:center;gap:20px;
-              margin-bottom:12px;padding:8px 14px;
-              background:rgba(255,255,255,0.04);
-              border:1px solid var(--border);border-radius:var(--radius-sm)">
-              <span style="font-size:13px;color:var(--muted)">
-                ✅ Done: <strong id="bulk-count-done" style="color:var(--success)">0</strong>
-              </span>
-              <span style="font-size:13px;color:var(--muted)">
-                ⏳ Pending: <strong id="bulk-count-pending" style="color:var(--warning)">0</strong>
-              </span>
-            </div>
-
-            <!-- Search bar — hidden until class loads -->
-            <div id="bulk-search-bar" style="display:none;margin-bottom:14px">
-              <input
-                type="text"
-                id="bulk-search"
-                class="form-control"
-                placeholder="🔍  Search student in this class…"
-                oninput="filterBulkRows(this.value)"
-                autocomplete="off"
-                style="max-width:340px"
-              />
-            </div>
-
-            <!-- Horizontal scroll wrapper for mobile -->
-            <div class="bulk-scroll-wrap">
-
-              <!-- Column headers -->
-              <div class="bulk-row header">
-                <div>Student</div>
-                <div>Type</div>
-                <div class="bulk-header-cell">
-                  <div class="cell-icon">🍽️</div>
-                  <div class="cell-label label-lunch">Lunch</div>
-                  <div class="cell-price">KES 50</div>
-                </div>
-                <div class="bulk-header-cell">
-                  <div class="cell-icon">☕</div>
-                  <div class="cell-label label-tea">Tea</div>
-                  <div class="cell-price">KES 15</div>
-                </div>
-                <div class="bulk-header-cell">
-                  <div class="cell-icon">🌾</div>
-                  <div class="cell-label label-porridge">Porridge</div>
-                  <div class="cell-price">KES 10</div>
-                </div>
-                <div style="text-align:right">Cost</div>
-                <div style="text-align:right">Status</div>
-              </div>
-
-              <!-- Student rows injected by bulk-ui.js -->
-              <div id="bulk-rows">
-                <div class="empty-state">
-                  <div class="empty-icon">📋</div>
-                  <p>Select a class to load students</p>
-                </div>
-              </div>
-
-            </div><!-- end bulk-scroll-wrap -->
-
-            <!-- Process button -->
-            <div id="bulk-footer" style="display:none;margin-top:20px">
-              <button class="btn btn-primary" id="bulk-process-btn">
-                ✅ Process All (<span id="pending-count">0</span> pending)
-              </button>
-            </div>
-
-          </div>
-        </div>
+        <div id="bulk-react-root"></div>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- ── Bulk Confirm Modal ── -->
-<div class="modal-overlay" id="bulk-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="bulk-modal-title">Confirm</div>
-      <button class="modal-close" id="bulk-modal-close">✕</button>
-    </div>
-    <div id="bulk-modal-content"></div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" id="bulk-modal-skip">Skip</button>
-      <button class="btn btn-primary"   id="bulk-modal-confirm">✅ Yes, Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
+<!-- Toast container — used by record-init.js showToast -->
 <div id="toast-container"></div>
 
 <!-- Bottom Navigation — mobile -->
@@ -283,23 +174,44 @@
   </a>
 </nav>
 
-<!-- ── Scripts ── -->
-<!-- Core -->
+<!-- ══════════════════════════════════════════════════════════
+  SCRIPTS — load order matters, do not rearrange
+
+  NOTE: No Babel CDN here. The .jsx files have been pre-compiled
+  into .js files using build.bat (or build.sh on Mac/Linux).
+  When you edit a .jsx file, run build.bat to recompile,
+  then commit both the .jsx and the compiled .js to GitHub.
+
+  GROUP 1: React CDN (no Babel — not needed after pre-compile)
+  GROUP 2: Your existing JS files — completely unchanged
+  GROUP 3: bulk-load.js — plain JS hook, no JSX
+  GROUP 4: Pre-compiled React components — normal script tags
+  GROUP 5: Your existing event/sidebar scripts — unchanged
+════════════════════════════════════════════════════════════ -->
+
+<!-- GROUP 1: React CDN only — no Babel needed -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+<!-- GROUP 2: Existing scripts — untouched -->
 <script src="../js/config.js"></script>
 <script src="../js/loading.js"></script>
-<script src="../js/sheets.js"></script>
 <script src="../js/animation.js"></script>
-
-<!-- Record page shared state + payment tab -->
+<script src="../js/sheets.js"></script>
 <script src="../js/record-init.js"></script>
 <script src="../js/recordpayment.js"></script>
 
-<!-- Bulk Daily Record — load order matters -->
+<!-- GROUP 3: Data loading hook — plain JS, no JSX -->
 <script src="../js/bulk-load.js"></script>
-<script src="../js/bulk-ui.js"></script>
-<script src="../js/bulk-process.js"></script>
 
-<!-- Wires all event listeners — must be last -->
+<!-- GROUP 4: Pre-compiled React components
+     These are the OUTPUT of build.bat — do not edit these directly.
+     Edit the .jsx files, then run build.bat to regenerate. -->
+<script src="../js/BulkTable.js"></script>
+<script src="../js/BulkModal.js"></script>
+<script src="../js/BulkDailyRecord.js"></script>
+
+<!-- GROUP 5: Existing scripts — untouched -->
 <script src="../js/record-events.js"></script>
 <script src="../js/sidebar.js"></script>
 
